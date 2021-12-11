@@ -1,0 +1,16 @@
+{
+  "name": "populationscripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "neo4jPopulation.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Manfredi Ignacio Agustín - Nicolás Franco Rampoldi",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "mongodb": "^4.2.1",
+    "neo4j-driver": "^4.4.1"
+  }
+}
