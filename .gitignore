@@ -1,4 +1,7 @@
 populationScripts/node_modules
 populationScripts/recipesAndInteractions
 populationScripts/recipes.json
+populationScripts/recipesAndInteractions.zip
 api/node_modules
+api/.env
+*/.DS_Store
