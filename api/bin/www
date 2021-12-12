@@ -16,10 +16,10 @@ var http = require("http");
 var mongoDriver;
 var neo4JDriver;
 
-require("../persistence/mongoDBUtils")().then(
+require("../persistence/drivers/mongoDBUtils")().then(
   (driver) => (mongoDriver = driver)
 );
-require("../persistence/neo4JDBUtils")().then(
+require("../persistence/drivers/neo4JDBUtils")().then(
   (driver) => (neo4jDriver = driver)
 );
 

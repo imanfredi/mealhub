@@ -26,8 +26,8 @@ app.use(cookieParser());
 
 /* Router middlewares */
 
-app.use('/users', usersRouter);
-app.use('/ingredients', ingredientsRouter);
+// app.use('/users', usersRouter);
+// app.use('/ingredients', ingredientsRouter);
 app.use('/recipes', recipesRouter);
 
 // catch 404 and forward to error handler
