@@ -23,7 +23,7 @@ El dataset utilizado puede encontrarse en: <a src="https://www.kaggle.com/shuyan
 1. Descargar la imagen de mongo e instanciar el contenedor.
 
     * docker pull mongo
-    * docker run --name mealhubMongo mongo
+    * docker run --name mealhubMongo -p 27017:27017 -d mongo
     * docker exec -it mealhubMongo bash
 
 El servidor de mongo escucha en su puerto estandar 27017
