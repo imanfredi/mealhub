@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Ingredient = require('../models/Ingredient');
 
+let searchService;
+await require('../services/searchService').then((service) => searchService = service);
+
 router.get('/', (req, res) => {
     //GET all ingredients
 });

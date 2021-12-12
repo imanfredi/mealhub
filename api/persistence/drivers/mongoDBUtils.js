@@ -35,9 +35,14 @@ class MongoDriver {
     }
 
 
-    async executeQuery(query,params,collection){
-        return await mongoDriver._db.collection(collection).findOne()
-       
+    async executeQuery(query,collection){
+        // return this._db
+        //         .collection(collection)
+        //         .aggregate(query);
+        //         // .find()
+        //         // .sort()
+        //         // .skip()
+        //         // .limit()
     }
     
 

@@ -21,7 +21,7 @@ require("../persistence/mongoDBUtils")().then(
 );
 require("../persistence/neo4JDBUtils")().then(
   (driver) => (neo4jDriver = driver)
-  );
+);
 
 /**
  * Get port from environment and store in Express.
