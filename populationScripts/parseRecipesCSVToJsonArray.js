@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = "./recipesAndInteractions/";
 const fileName = "RAW_recipes.csv";
 const filePath = path + fileName;
-const outFileName = "recipes2 .json";
+const outFileName = "recipes.json";
 
 async function main() {
   await fs.appendFile(outFileName, "[", (err) => {
@@ -35,7 +35,7 @@ async function main() {
       tags[tags.length - 1] = tags.at(-1).slice(0, -1);
 
       let recipe = {
-        title: row.name,
+        title: row.name.trim().replace(/\s\s+/g, ' '),
         description: row.description,
         ingredients: ingredients,
         n_ingredients: parseInt(row.n_ingredients),
