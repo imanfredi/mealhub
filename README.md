@@ -34,6 +34,10 @@ El servidor de mongo escucha en su puerto estandar 27017
 3. Luego dentro del contenedor ejecutar el comando:
 
     * mongoimport --db mealhub --collection recipes --file recipes.json --jsonArray
+    * mongoexport --collection=recipes --db=mealhub --out=recipesMongo.json --jsonArray
+4. Salir del contenedor y ejecutar el comando
+    * docker cp mealhubMongo:/recipesMongo.json ./recipesMongo.json
+
 
 ### Neo4J
 

@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const { title, nutrition } = require("../../models/Recipe");
 
 let collection = "recipes";
@@ -32,22 +33,22 @@ class RecipesDao {
     page,
     pageSize
   ) {
-    if (filterByIngredients || filterByNotIngredients) {
-      let query = this.buildNeo4Jquery(
-        filterByIngredients,
-        filterByNotIngredients,
-        orderBy,
-        page,
-        pageSize
-      );
-      return (await this._neo4jDriver).executeQuery(query);
-    } else {
-      let aggregation = this.buildMongoQuery(orderBy, page, pageSize);
-      return await this._mongoDriver.executeQueryAggregated(
-        aggregation,
-        collection
-      );
-    }
+    let query = this.buildNeo4Jquery(
+      filterByIngredients,
+      filterByNotIngredients,
+      orderBy,
+      page,
+      pageSize
+    );
+    let results = await this._neo4jDriver.executeQuery(query);
+
+    let aggregation = this.buildMongoQuery(results, orderBy);
+    let recipes = await this._mongoDriver.executeQueryAggregated(
+      aggregation,
+      collection
+    );
+    console.log(recipes);
+    return recipes;
   }
 
   async getRecipesById(id) {
@@ -168,7 +169,16 @@ class RecipesDao {
     return query;
   }
 
-  buildMongoQuery(orderBy, page, pageSize) {
+  buildMongoQuery(results, orderBy) {
+    // let ids = '[';
+    let ids = [];
+    for (const result of results) {
+      ids.push(ObjectId(result));
+      // ids+=`'${result.id}',`;
+    }
+    // ids = ids.slice(0,-1);
+    // ids+=']';
+
     let aux = orderBy.split("_");
 
     let orderCriteria = aux[1].toLowerCase();
@@ -183,8 +193,16 @@ class RecipesDao {
     if (aux[1] != "MINUTES") {
       orderCriteria = "nutrition." + orderCriteria;
     }
+    console.log(orderBy);
 
     let aggregation = [
+      {
+        $match: {
+          _id: {
+            $in: ids,
+          },
+        },
+      },
       {
         $sort: {
           [orderCriteria]: order,
@@ -192,8 +210,6 @@ class RecipesDao {
           _id: 1,
         },
       },
-      { $limit: parseInt(pageSize) },
-      { $skip: parseInt(page * pageSize) },
     ];
 
     return aggregation;

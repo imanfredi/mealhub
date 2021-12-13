@@ -21,6 +21,10 @@ class RecipeService {
       return await this._recipesDao.getRecipesByName(name);
   }
 
+  async getRecipesById(id){
+    
+  }
+
 }
 
 let recipeService = new RecipeService();

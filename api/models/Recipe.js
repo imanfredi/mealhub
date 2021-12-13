@@ -2,7 +2,7 @@ let uri = "recipes";
 
 class Recipe {
   constructor(recipe) {
-    this._id = recipe.id;
+    this._id = recipe._id;
     this._description = recipe.description;
     this._ingredients = recipe.ingredients;
     this._n_ingredients = recipe.n_ingredients;
