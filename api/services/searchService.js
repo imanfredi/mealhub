@@ -1,5 +1,5 @@
 const PaginatedSearchResult = require("../models/PaginatedSearchResult");
-const orderByOptions = require("../models/OrderByOptions");
+const orderByOptions = require("../models/RecipeOrderByOptions");
 const express = require("express");
 
 class SearchService {
@@ -40,13 +40,12 @@ class SearchService {
       orderBy = orderByOptions.LESS_CALORIES;
     }
 
-    let totalRecipes = await this._recipesDao.getTotalRecipesCount();
-    console.log(totalRecipes)
+    let totalRecipes = await this._recipesDao.getTotalRecipesCount(filterByIngredients,filterByNotIngredients);
     let totalPages = Math.ceil(totalRecipes / pageSize);
 
     //No hay ninguna receta o la pagina solicitada no tiene resultados porque no hay suficiente cantidad
     if (totalPages == 0 || page >= totalPages) {
-      return new PaginatedSearchResult(page, pageSize, totalRecipes, new []());
+      return new PaginatedSearchResult(page, pageSize, totalRecipes, new Array());
     }
 
     let results = await this._recipesDao.getRecipes(

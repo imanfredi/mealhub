@@ -1,4 +1,4 @@
-const { title } = require("../../models/Recipe");
+const { title, nutrition } = require("../../models/Recipe");
 
 let collection = "recipes";
 
@@ -17,9 +17,12 @@ class RecipesDao {
     this._neo4jDriver = await require("../drivers/neo4jDBUtils")();
   }
 
-  async getTotalRecipesCount() {
-    let query = [{ $count: "count" }];
-    return (await this._mongoDriver).executeQueryAggregated(query, collection);
+  async getTotalRecipesCount(filterByIngredients, filterByNotIngredients) {
+    let query = this.buildNeo4JQueryCount(
+      filterByIngredients,
+      filterByNotIngredients
+    );
+    return (await this._neo4jDriver).executeQueryCount(query);
   }
 
   async getRecipes(
@@ -29,7 +32,7 @@ class RecipesDao {
     page,
     pageSize
   ) {
-    if (filterByNotIngredients || filterByNotIngredients) {
+    if (filterByIngredients || filterByNotIngredients) {
       let query = this.buildNeo4Jquery(
         filterByIngredients,
         filterByNotIngredients,
@@ -40,11 +43,26 @@ class RecipesDao {
       return (await this._neo4jDriver).executeQuery(query);
     } else {
       let aggregation = this.buildMongoQuery(orderBy, page, pageSize);
-      return (await this._mongoDriver).executeQueryAggregated(
+      return await this._mongoDriver.executeQueryAggregated(
         aggregation,
         collection
       );
     }
+  }
+
+  async getRecipesById(id) {
+    let aggregation = [
+      {
+        $match: {
+          _id: id,
+        },
+      },
+    ];
+
+    return await this._mongoDriver.executeQueryAggregated(
+      aggregation,
+      collection
+    );
   }
 
   buildNeo4Jquery(
@@ -54,80 +72,100 @@ class RecipesDao {
     page,
     pageSize
   ) {
+    let query =
+      "MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe) " +
+      "WITH r, collect(i.name) as r_ingredients, ";
 
-    let query = 'MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe) '+
-                'WITH r, collect(i.name) as r_ingredients, ';
+    if (filterByIngredients) {
+      let aux = "[";
 
-    if(filterByIngredients){
-        query += `${filterByIngredients} as ingredients WHERE apoc.coll.containsAll(r_ingredients, ingredients) `
-        if(filterByNotIngredients){
-          query+= 'WITH r, r_ingredients, '
-        }
+      for (var i = 0; i < filterByIngredients.length; i++) {
+        // aux += "'(?i).*" + filterByIngredients[i] + ".*',";
+        aux += "'" + filterByIngredients[i] + "',";
+      }
+      aux = aux.slice(0, -1);
+
+      aux += "]";
+
+      query += `${aux} as ingredients WHERE apoc.coll.containsAll(r_ingredients, ingredients) `;
+      if (filterByNotIngredients) {
+        query += "WITH r, r_ingredients, ";
+      }
     }
 
-    if(filterByNotIngredients) {
-      query += `${filterByNotIngredients} as ingredients WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN ingredients) RETURN DISTINCT r;`
+    if (filterByNotIngredients) {
+      let aux = "[";
+
+      for (var i = 0; i < filterByNotIngredients.length; i++) {
+        // aux += "'(?i).*" + filterByNotIngredients[i] + ".*',";
+        aux += "'" + filterByNotIngredients[i] + "',";
+      }
+
+      aux = aux.slice(0, -1);
+      aux += "]";
+
+      query += `${aux} as notIngredients WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN notIngredients) `;
     }
 
-    console.log(query)
+    query += "RETURN DISTINCT r";
 
-    
+    let aux = orderBy.split("_");
 
-   
-    /*
+    let orderCriteria = aux[1].toLowerCase();
+    let order;
 
+    if (aux[0] == "LESS") {
+      order = "DESC";
+    } else {
+      order = "ASC";
+    }
 
-    MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe)
+    let order_by = ` ORDER BY r.${orderCriteria}, r.name, id(r)  ${order}`;
+    let limit = ` LIMIT ${pageSize}`;
+    let skip = ` SKIP ${pageSize * page}`;
 
-    WITH r, collect(i.name) as r_ingredients, ${filterByIngredients} as ingredients
-    WHERE apoc.coll.containsAll(r_ingredients, ingredients)
-    
-    
-    WITH r,i,r_ingredients, ${filterByNotIngredientes} as notIngredients
-    WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN notIngredients) 
-    return distinct(r)
+    query += order_by + skip + limit;
+    return query;
+  }
 
+  buildNeo4JQueryCount(filterByIngredients, filterByNotIngredients) {
+    let query = "MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe) ";
 
+    if (filterByIngredients) {
+      query += "WITH r, collect(i.name) as r_ingredients, ";
 
-    MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe)
-    WITH r, i, collect(i.name) as r_ingredients, ['salt', 'pepper', 'eggs'] as ingredients 
-    WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN ingredients) 
-    
-    
-    
-    RETURN DISTINCT i;
-    */
+      let aux = "[";
 
-    /*
-    MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe)
-    WITH r, collect(i.name) as r_ingredients, ['salt', 'pepper'] as ingredients
-    WHERE apoc.coll.containsAll(r_ingredients, ingredients)
-    RETURN r;
-    */
+      for (var i = 0; i < filterByIngredients.length; i++) {
+        // aux += "'(?i).*" + filterByIngredients[i] + ".*',";
+        aux += "'" + filterByIngredients[i] + "',";
+      }
+      aux = aux.slice(0, -1);
 
+      aux += "]";
 
+      query += `${aux} as ingredients WHERE apoc.coll.containsAll(r_ingredients, ingredients) `;
+    }
 
+    if (filterByNotIngredients) {
+      query += "WITH r, r_ingredients, ";
 
+      let aux = "[";
 
+      for (var i = 0; i < filterByNotIngredients.length; i++) {
+        // aux += "'(?i).*" + filterByNotIngredients[i] + ".*',";
+        aux += "'" + filterByNotIngredients[i] + "',";
+      }
 
+      aux = aux.slice(0, -1);
+      aux += "]";
 
-    /*
-    MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe)
-    WITH r, i, collect(i.name) as r_ingredients, ['salt', 'pepper', 'eggs'] as ingredients 
-    WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN ingredients) 
-    
-    
-    
-    RETURN DISTINCT i;
-    */
+      query += `${aux} as notIngredients WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN notIngredients) `;
+    }
 
-    /*
-    MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe)
-    WITH r, collect(i.name) as r_ingredients, ['salt', 'pepper'] as ingredients
-    WHERE apoc.coll.containsAll(r_ingredients, ingredients)
-    RETURN r;
-    */
+    query += "RETURN count(DISTINCT r)";
 
+    return query;
   }
 
   buildMongoQuery(orderBy, page, pageSize) {
@@ -137,9 +175,13 @@ class RecipesDao {
     let order;
 
     if (aux[0] == "LESS") {
-      order = -1;
-    } else {
       order = 1;
+    } else {
+      order = -1;
+    }
+
+    if (aux[1] != "MINUTES") {
+      orderCriteria = "nutrition." + orderCriteria;
     }
 
     let aggregation = [
@@ -150,8 +192,8 @@ class RecipesDao {
           _id: 1,
         },
       },
-      { $limit: pageSize },
-      { $skip: page * pageSize },
+      { $limit: parseInt(pageSize) },
+      { $skip: parseInt(page * pageSize) },
     ];
 
     return aggregation;

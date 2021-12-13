@@ -1,4 +1,4 @@
-const orderByOptions = {
+const recipeOrderByOptions = {
     LESS_MINUTES: "LESS_MINUTES",
     MOST_MINUTES:"MOST_MINUTES",
     LESS_CALORIES: "LESS_CALORIES",
@@ -12,6 +12,6 @@ const orderByOptions = {
 }
 
 
-Object.freeze(orderByOptions);
+Object.freeze(recipeOrderByOptions);
 
-module.exports = orderByOptions;
+module.exports = recipeOrderByOptions;

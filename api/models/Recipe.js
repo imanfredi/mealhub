@@ -1,63 +1,22 @@
+let uri = "recipes";
 
-const recipeSchema = {
-    title : {
-        type: String,
-        required : true 
-    },
-    description: {
-        type: String,
-        default: ''
-    },   
-    ingredients: {
-        type: [],
-        required: true        
-    },
-    n_ingredients:{
-        type: Number,
-        
-    },
-    steps:{
-        type: String,
-        required: true
-    },
-    n_steps:{
-        type: Number,
-    },
-    minutes:{
-        type:Number,
-    },
-    tags:{
-        type:[],
-    },
-    nutrition:{
-        type : {
-            calories:{
-                type:Number
-            },
-            totalFat:{
-                type:Number
-            },
-            sugar:{
-                type:Number
-            },
-            sodium:{
-                type:Number
-            },
-            protein:{
-                type:Number
-            },
-            saturatedFat:{
-                type:Number
-            },
-            carbohydrates:{
-                type:Number
-            },
-        }
+class Recipe {
+  constructor(recipe) {
+    this._id = recipe.id;
+    this._description = recipe.description;
+    this._ingredients = recipe.ingredients;
+    this._n_ingredients = recipe.n_ingredients;
+    this._steps = recipe.steps;
+    this._n_steps = recipe.n_steps;
+    this._minutes = recipe.minutes;
+    this._tags = recipe.tags;
+    this._nutrition = recipe.nutrition;
+    this._url = this.buildUrl();
+  }
 
-    } 
-
-
+  buildUrl() {
+    return process.env.BASE_URI  + uri + "/" + this._id;
+  }
 }
 
-
-module.exports = recipeSchema;
+module.exports = Recipe;

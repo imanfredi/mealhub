@@ -6,8 +6,11 @@ class PaginatedSearchResult {
     this._results = results;
     this._totalPages = Math.ceil(totalItems / itemsPerPage);
     this._isFirst = page == 0;
-    this._isLast = this._itemsPerPage * this._page + this._results.size > this._itemsPerPage * (this._totalPages - 1) &&
-      this._itemsPerPage * this._page + this._results.size <= this._itemsPerPage * this._totalPages;
+    this._isLast =
+      this._itemsPerPage * this._page + this._results.size >
+        this._itemsPerPage * (this._totalPages - 1) &&
+      this._itemsPerPage * this._page + this._results.size <=
+        this._itemsPerPage * this._totalPages;
   }
 
   isLast() {
@@ -17,7 +20,7 @@ class PaginatedSearchResult {
   isFirst() {
     return this._isFirst;
   }
-
+  
   getTotalPages() {
     return this._totalPages;
   }
@@ -62,6 +65,5 @@ class PaginatedSearchResult {
     this._results = results;
   }
 }
-
 
 module.exports = PaginatedSearchResult;

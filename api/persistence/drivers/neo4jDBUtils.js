@@ -29,9 +29,22 @@ class Neo4JDriver {
   }
 
   async executeQuery(query) {
-    return await this._driver
+    let aux = await this._driver
       .session()
       .readTransaction((txc) => txc.run(query));
+    let results = [];
+    aux.records.map((record) => {
+      results.push(record._fields[0].properties);
+    });
+    return results;
+  }
+
+  async executeQueryCount(query) {
+    let aux = await this._driver
+      .session()
+      .readTransaction((txc) => txc.run(query));
+
+    return parseInt(aux.records[0]._fields[0].toString());
   }
 }
 

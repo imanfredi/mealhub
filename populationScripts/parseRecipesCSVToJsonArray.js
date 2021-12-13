@@ -44,6 +44,7 @@ async function main() {
         minutes: parseInt(row.minutes),
         tags: tags,
         nutrition: {
+          
           calories: parseFloat(nutrition[0]),
           totalFat: parseFloat(nutrition[1]),
           sugar: parseFloat(nutrition[2]),
