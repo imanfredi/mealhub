@@ -18,7 +18,7 @@ class RecipesDao {
   }
 
   async getTotalRecipesCount() {
-    let query = [{ $count: 'count' }];
+    let query = [{ $count: "count" }];
     return (await this._mongoDriver).executeQueryAggregated(query, collection);
   }
 
@@ -37,14 +37,7 @@ class RecipesDao {
         page,
         pageSize
       );
-      return (await this._neo4jDriver).executeQuery(
-        query,
-        filterByIngredients,
-        filterByNotIngredients,
-        orderBy,
-        page,
-        pageSize
-      );
+      return (await this._neo4jDriver).executeQuery(query);
     } else {
       let aggregation = this.buildMongoQuery(orderBy, page, pageSize);
       return (await this._mongoDriver).executeQueryAggregated(
@@ -61,7 +54,80 @@ class RecipesDao {
     page,
     pageSize
   ) {
-    return "";
+
+    let query = 'MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe) '+
+                'WITH r, collect(i.name) as r_ingredients, ';
+
+    if(filterByIngredients){
+        query += `${filterByIngredients} as ingredients WHERE apoc.coll.containsAll(r_ingredients, ingredients) `
+        if(filterByNotIngredients){
+          query+= 'WITH r, r_ingredients, '
+        }
+    }
+
+    if(filterByNotIngredients) {
+      query += `${filterByNotIngredients} as ingredients WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN ingredients) RETURN DISTINCT r;`
+    }
+
+    console.log(query)
+
+    
+
+   
+    /*
+
+
+    MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe)
+
+    WITH r, collect(i.name) as r_ingredients, ${filterByIngredients} as ingredients
+    WHERE apoc.coll.containsAll(r_ingredients, ingredients)
+    
+    
+    WITH r,i,r_ingredients, ${filterByNotIngredientes} as notIngredients
+    WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN notIngredients) 
+    return distinct(r)
+
+
+
+    MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe)
+    WITH r, i, collect(i.name) as r_ingredients, ['salt', 'pepper', 'eggs'] as ingredients 
+    WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN ingredients) 
+    
+    
+    
+    RETURN DISTINCT i;
+    */
+
+    /*
+    MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe)
+    WITH r, collect(i.name) as r_ingredients, ['salt', 'pepper'] as ingredients
+    WHERE apoc.coll.containsAll(r_ingredients, ingredients)
+    RETURN r;
+    */
+
+
+
+
+
+
+
+    /*
+    MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe)
+    WITH r, i, collect(i.name) as r_ingredients, ['salt', 'pepper', 'eggs'] as ingredients 
+    WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN ingredients) 
+    
+    
+    
+    RETURN DISTINCT i;
+    */
+
+    /*
+    MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe)
+    WITH r, collect(i.name) as r_ingredients, ['salt', 'pepper'] as ingredients
+    WHERE apoc.coll.containsAll(r_ingredients, ingredients)
+    RETURN r;
+    */
+
   }
 
   buildMongoQuery(orderBy, page, pageSize) {
@@ -70,7 +136,7 @@ class RecipesDao {
     let orderCriteria = aux[1].toLowerCase();
     let order;
 
-    if (aux[0] == 'LESS') {
+    if (aux[0] == "LESS") {
       order = -1;
     } else {
       order = 1;
