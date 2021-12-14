@@ -3,7 +3,9 @@
     <AppBar></AppBar>
     <v-main>
       <v-fade-transition appear>
-        <router-view></router-view>
+        <v-container fill-height fluid class="bgImage">
+          <router-view></router-view>
+        </v-container>
       </v-fade-transition>
     </v-main>
     <Footer></Footer>

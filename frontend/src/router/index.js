@@ -13,6 +13,11 @@ const routes = [
         name: "landingPage",
         component: () => import("../views/LandingPage"),
       },
+      {
+        path: "recipes/:id",
+        name: "recipe",
+        component: () => import("../views/Recipe"),
+      },
     ],
   },
 ];

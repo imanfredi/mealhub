@@ -1,5 +1,5 @@
 <template>
-  <v-card elevation="2" outlined class="d-flex-column grow">
+  <v-card elevation="2" outlined class="d-flex-column grow" to="/recipes/3">
     <v-card-title>Recipe</v-card-title>
     <v-card-subtitle>The best recipe in the world</v-card-subtitle>
     <v-card-text class="d-flex justify-end"

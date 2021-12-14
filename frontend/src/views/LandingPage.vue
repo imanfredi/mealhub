@@ -1,5 +1,5 @@
 <template>
-  <v-container fill-height fluid class="bgImage">
+  <v-container>
     <v-row>
       <v-col cols="5">
         <v-card color="#F1FAEE" class="ml-16 pt-5 px-4">
