@@ -1,3 +1,4 @@
+const e = require("express");
 const { ObjectId } = require("mongodb");
 const { title, nutrition } = require("../../models/Recipe");
 
@@ -18,8 +19,13 @@ class RecipesDao {
     this._neo4jDriver = await require("../drivers/neo4jDBUtils")();
   }
 
-  async getTotalRecipesCount(filterByIngredients, filterByNotIngredients) {
+  async getTotalRecipesCount(
+    searchByName,
+    filterByIngredients,
+    filterByNotIngredients
+  ) {
     let query = this.buildNeo4JQueryCount(
+      searchByName,
       filterByIngredients,
       filterByNotIngredients
     );
@@ -27,6 +33,7 @@ class RecipesDao {
   }
 
   async getRecipes(
+    searchByName,
     filterByIngredients,
     filterByNotIngredients,
     orderBy,
@@ -34,6 +41,7 @@ class RecipesDao {
     pageSize
   ) {
     let query = this.buildNeo4Jquery(
+      searchByName,
       filterByIngredients,
       filterByNotIngredients,
       orderBy,
@@ -47,7 +55,6 @@ class RecipesDao {
       aggregation,
       collection
     );
-    console.log(recipes);
     return recipes;
   }
 
@@ -67,45 +74,60 @@ class RecipesDao {
   }
 
   buildNeo4Jquery(
+    searchByName,
     filterByIngredients,
     filterByNotIngredients,
     orderBy,
     page,
     pageSize
   ) {
-    let query =
-      "MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe) " +
-      "WITH r, collect(i.name) as r_ingredients, ";
+    let query;
 
-    if (filterByIngredients) {
-      let aux = "[";
-
-      for (var i = 0; i < filterByIngredients.length; i++) {
-        // aux += "'(?i).*" + filterByIngredients[i] + ".*',";
-        aux += "'" + filterByIngredients[i] + "',";
-      }
-      aux = aux.slice(0, -1);
-
-      aux += "]";
-
-      query += `${aux} as ingredients WHERE apoc.coll.containsAll(r_ingredients, ingredients) `;
-      if (filterByNotIngredients) {
-        query += "WITH r, r_ingredients, ";
-      }
+    if (searchByName) {
+      query =
+        'CALL db.index.fulltext.queryNodes("name","' +
+        searchByName +
+        '~") YIELD node WITH node as r ' +
+        "MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r) ";
+    } else {
+      query = "MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe) ";
     }
+    query += "WITH r ";
 
-    if (filterByNotIngredients) {
-      let aux = "[";
+    if (filterByNotIngredients || filterByIngredients) {
+      query += ", collect(i.name) as r_ingredients, ";
 
-      for (var i = 0; i < filterByNotIngredients.length; i++) {
-        // aux += "'(?i).*" + filterByNotIngredients[i] + ".*',";
-        aux += "'" + filterByNotIngredients[i] + "',";
+      if (filterByIngredients) {
+        let aux = "[";
+
+        for (var i = 0; i < filterByIngredients.length; i++) {
+          // aux += "'(?i).*" + filterByIngredients[i] + ".*',";
+          aux += "'" + filterByIngredients[i] + "',";
+        }
+        aux = aux.slice(0, -1);
+
+        aux += "]";
+
+        query += `${aux} as ingredients WHERE apoc.coll.containsAll(r_ingredients, ingredients) `;
+
+        if (filterByNotIngredients) {
+          query += "WITH r, r_ingredients, ";
+        }
       }
 
-      aux = aux.slice(0, -1);
-      aux += "]";
+      if (filterByNotIngredients) {
+        let aux = "[";
 
-      query += `${aux} as notIngredients WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN notIngredients) `;
+        for (var i = 0; i < filterByNotIngredients.length; i++) {
+          // aux += "'(?i).*" + filterByNotIngredients[i] + ".*',";
+          aux += "'" + filterByNotIngredients[i] + "',";
+        }
+
+        aux = aux.slice(0, -1);
+        aux += "]";
+
+        query += `${aux} as notIngredients WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN notIngredients) `;
+      }
     }
 
     query += "RETURN DISTINCT r";
@@ -129,39 +151,56 @@ class RecipesDao {
     return query;
   }
 
-  buildNeo4JQueryCount(filterByIngredients, filterByNotIngredients) {
-    let query = "MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe) ";
+  buildNeo4JQueryCount(
+    searchByName,
+    filterByIngredients,
+    filterByNotIngredients
+  ) {
+    let query;
 
-    if (filterByIngredients) {
-      query += "WITH r, collect(i.name) as r_ingredients, ";
-
-      let aux = "[";
-
-      for (var i = 0; i < filterByIngredients.length; i++) {
-        // aux += "'(?i).*" + filterByIngredients[i] + ".*',";
-        aux += "'" + filterByIngredients[i] + "',";
-      }
-      aux = aux.slice(0, -1);
-
-      aux += "]";
-
-      query += `${aux} as ingredients WHERE apoc.coll.containsAll(r_ingredients, ingredients) `;
+    if (searchByName) {
+      query =
+        'CALL db.index.fulltext.queryNodes("name","' +
+        searchByName +
+        '~") YIELD node WITH node as r ' +
+        "MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r) ";
+    } else {
+      query = "MATCH (i:Ingredient)-[:INGREDIENT_OF]->(r:Recipe) ";
     }
+    query += "WITH r ";
 
-    if (filterByNotIngredients) {
-      query += "WITH r, r_ingredients, ";
+    if (filterByNotIngredients || filterByNotIngredients) {
+      query += ", collect(i.name) as r_ingredients, ";
 
-      let aux = "[";
+      if (filterByIngredients) {
+        let aux = "[";
 
-      for (var i = 0; i < filterByNotIngredients.length; i++) {
-        // aux += "'(?i).*" + filterByNotIngredients[i] + ".*',";
-        aux += "'" + filterByNotIngredients[i] + "',";
+        for (var i = 0; i < filterByIngredients.length; i++) {
+          // aux += "'(?i).*" + filterByIngredients[i] + ".*',";
+          aux += "'" + filterByIngredients[i] + "',";
+        }
+        aux = aux.slice(0, -1);
+        aux += "]";
+        query += `${aux} as ingredients WHERE apoc.coll.containsAll(r_ingredients, ingredients) `;
+
+        if (filterByNotIngredients) {
+          query += "WITH r, r_ingredients, ";
+        }
       }
 
-      aux = aux.slice(0, -1);
-      aux += "]";
+      if (filterByNotIngredients) {
+        let aux = "[";
 
-      query += `${aux} as notIngredients WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN notIngredients) `;
+        for (var i = 0; i < filterByNotIngredients.length; i++) {
+          // aux += "'(?i).*" + filterByNotIngredients[i] + ".*',";
+          aux += "'" + filterByNotIngredients[i] + "',";
+        }
+
+        aux = aux.slice(0, -1);
+        aux += "]";
+
+        query += `${aux} as notIngredients WHERE NOT ANY(ingredient in r_ingredients WHERE ingredient IN notIngredients) `;
+      }
     }
 
     query += "RETURN count(DISTINCT r)";
@@ -170,14 +209,10 @@ class RecipesDao {
   }
 
   buildMongoQuery(results, orderBy) {
-    // let ids = '[';
     let ids = [];
     for (const result of results) {
       ids.push(ObjectId(result));
-      // ids+=`'${result.id}',`;
     }
-    // ids = ids.slice(0,-1);
-    // ids+=']';
 
     let aux = orderBy.split("_");
 
@@ -193,7 +228,6 @@ class RecipesDao {
     if (aux[1] != "MINUTES") {
       orderCriteria = "nutrition." + orderCriteria;
     }
-    console.log(orderBy);
 
     let aggregation = [
       {

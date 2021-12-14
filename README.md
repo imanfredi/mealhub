@@ -53,3 +53,7 @@ El servidor de mongo escucha en su puerto estandar 27017
 
     * node neo4jPopulation.js
 
+4. Abrir localhost:7474 y ejecutar el siguiente comando en la consola
+ 
+    * CREATE FULLTEXT INDEX name FOR (r:Recipe) ON EACH [r.name]
+

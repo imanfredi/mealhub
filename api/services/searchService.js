@@ -16,6 +16,7 @@ class SearchService {
   }
 
   async getRecipes(
+    searchByName,
     filterByIngredients,
     filterByNotIngredients,
     orderBy,
@@ -40,15 +41,25 @@ class SearchService {
       orderBy = orderByOptions.LESS_CALORIES;
     }
 
-    let totalRecipes = await this._recipesDao.getTotalRecipesCount(filterByIngredients,filterByNotIngredients);
+    let totalRecipes = await this._recipesDao.getTotalRecipesCount(
+      searchByName,
+      filterByIngredients,
+      filterByNotIngredients
+    );
     let totalPages = Math.ceil(totalRecipes / pageSize);
 
     //No hay ninguna receta o la pagina solicitada no tiene resultados porque no hay suficiente cantidad
     if (totalPages == 0 || page >= totalPages) {
-      return new PaginatedSearchResult(page, pageSize, totalRecipes, new Array());
+      return new PaginatedSearchResult(
+        page,
+        pageSize,
+        totalRecipes,
+        new Array()
+      );
     }
 
     let results = await this._recipesDao.getRecipes(
+      searchByName,
       filterByIngredients,
       filterByNotIngredients,
       orderBy,
