@@ -1,6 +1,6 @@
 <template>
   <v-fade-transition appear>
-    <router-view />
+    <router-view/>
   </v-fade-transition>
 </template>
 

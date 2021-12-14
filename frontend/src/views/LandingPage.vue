@@ -94,6 +94,7 @@
 
 <script>
 import RecipeCard from "../components/RecipeCard.vue";
+import axios from "axios";
 
 export default {
   data() {
@@ -105,11 +106,31 @@ export default {
         { text: "Sugar (g)", value: "sugar" },
         { text: "Minutes", value: "minutes" },
       ],
+      recipes: [],
+      ingredients: [],
     };
   },
   name: "LandingPage",
   components: {
     RecipeCard,
+  },
+
+  created() {
+    axios
+      .get(process.env.VUE_APP_BASE_API_URL + "/recipes")
+      .then((response) => {
+        this.recipes = response.data;
+        console.log(response.headers);
+
+        console.log(response);
+      });
+
+    // axios
+    //   .get(process.env.VUE_APP_BASE_API_URL + "/ingredients")
+    //   .then((response) => {
+    //     this.ingredients = response.data;
+    //     console.log(response.headers.get("Link"));
+    //   });
   },
 };
 </script>
