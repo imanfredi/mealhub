@@ -2,17 +2,18 @@ import axios from "axios";
 
 export default {
   async getRecipes(context, payload) {
+    let params = buildParams(payload);
+
     try {
-      axios
-        .get(
-          `${context.getters.baseUrl}/recipes` + new URLSearchParams(...payload)
-        )
-        .then((response) => {
-          this.$store.commit("recipes", response.data);
-          let pagination = this.parseLink(response.headers.link);
-          return { ...pagination, ...response.data };
-        });
-    } catch (e) {
+      let response = await axios.get(
+        `${context.getters.baseURL}/recipes?` + new URLSearchParams(params)
+      );
+      let pagination = parseLink(response.headers.link);
+      return {
+        recipes: response.data,
+        ...pagination,
+      };
+    } catch (error) {
       console.log(error);
       return null;
     }
@@ -20,12 +21,11 @@ export default {
 
   async getRecipesById(context, payload) {
     try {
-      axios
-        .get(`${context.getters.baseUrl}/recipes?` + payload.id)
-        .then((response) => {
-          return response.data;
-        });
-    } catch (e) {
+      let response = await axios.get(
+        `${context.getters.baseUrl}/recipes/` + payload.id
+      );
+      return response.data;
+    } catch (error) {
       console.log(error);
       return null;
     }
@@ -34,13 +34,10 @@ export default {
 
 function parseLink(linkHeader) {
   let pagination = {};
-
   let links = linkHeader.split(",");
-
   for (const link of links) {
     let aux = link.split(";");
     let url = new URL(aux[0]);
-
     if (aux[1] == " rel=first") {
       pagination.first = parseInt(url.searchParams.get("page"));
     } else if (aux[1] == " rel=last") {
@@ -50,13 +47,33 @@ function parseLink(linkHeader) {
     } else {
       pagination.next = parseInt(url.searchParams.get("page"));
     }
-    if (pagination.prev == null) {
-      pagination.prev = pagination.first;
-    }
-    if (pagination.next == null) {
-      pagination.next = pagination.last;
-    }
-    pagination.total = pagination.last;
-    return pagination;
   }
+  if (pagination.prev == null) {
+    pagination.prev = pagination.first;
+  }
+  if (pagination.next == null) {
+    pagination.next = pagination.last;
+  }
+  pagination.total = pagination.last;
+  return pagination;
+}
+
+function buildParams(payload) {
+  let params = {
+    pageSize: payload.pageSize,
+    page: payload.page,
+  };
+
+  if (payload.queryName) {
+    params.queryName = payload.queryName;
+  }
+
+  if (payload.ingredients) {
+    params.ingredients = payload.ingredients;
+  }
+
+  if (payload.notIngredients) {
+    params.notIngredients = payload.notIngredients;
+  }
+  return params;
 }

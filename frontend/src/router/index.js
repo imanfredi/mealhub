@@ -14,8 +14,11 @@ const routes = [
         component: () => import("../views/LandingPage"),
       },
       {
-        path: "recipes/:id",
-        name: "recipe",
+        name: "RecipeDetails",
+        path: "/recipes/:id",
+        props: (route) => ({
+          recipe: route.params.recipe,
+        }),
         component: () => import("../views/Recipe"),
       },
     ],

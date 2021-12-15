@@ -1,5 +1,1 @@
-export default {
-  recipes(state) {
-    return state.recipes;
-  },
-};
+export default {};

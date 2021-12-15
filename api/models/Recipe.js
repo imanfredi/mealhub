@@ -2,21 +2,21 @@ let uri = "recipes";
 
 class Recipe {
   constructor(recipe) {
-    this._id = recipe._id;
-    this._title = recipe.title;
-    this._description = recipe.description;
-    this._ingredients = recipe.ingredients;
-    this._n_ingredients = recipe.n_ingredients;
-    this._steps = recipe.steps;
-    this._n_steps = recipe.n_steps;
-    this._minutes = recipe.minutes;
-    this._tags = recipe.tags;
-    this._nutrition = recipe.nutrition;
-    this._url = this.buildUrl();
+    this.id = recipe._id;
+    this.title = recipe.title;
+    this.description = recipe.description;
+    this.ingredients = recipe.ingredients;
+    this.n_ingredients = recipe.n_ingredients;
+    this.steps = recipe.steps;
+    this.n_steps = recipe.n_steps;
+    this.minutes = recipe.minutes;
+    this.tags = recipe.tags;
+    this.nutrition = recipe.nutrition;
+    this.url = this.buildUrl();
   }
 
   buildUrl() {
-    return process.env.BASE_URI + uri + "/" + this._id;
+    return process.env.BASE_URI + uri + "/" + this.id;
   }
 }
 

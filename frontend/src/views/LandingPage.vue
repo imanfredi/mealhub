@@ -91,7 +91,7 @@
       </v-col>
       <v-col cols="6" class="d-flex-column align-center">
         <v-card height="620px" color="#F1FAEE">
-          <v-container v-if="loadingRecipes">
+          <v-container v-if="!loadingRecipes">
             <v-row>
               <v-col cols="12" class="pt-7">
                 <v-data-table
@@ -112,7 +112,6 @@
             <v-pagination
               @input="onPageChange($event)"
               :length="last"
-              circle
               color="#A8DADC"
               v-model="page"
               :total-visible="visible"
@@ -150,15 +149,17 @@ export default {
         { text: "Sugar (g)", value: "sugar" },
         { text: "Minutes", value: "minutes" },
       ],
+      recipes: [],
       loadingRecipes: true,
       loadingIngredients: true,
-      first: Number,
-      last: Number,
-      next: Number,
-      prev: Number,
+      first: 0,
+      last: 0,
+      next: 0,
+      prev: 0,
       page: 1,
       visible: 5,
       queryName: "",
+      pageSize: 3,
     };
   },
   components: {
@@ -166,43 +167,37 @@ export default {
   },
 
   computed: {
-    ...mapGetters([
-      "recipes",
-      "ingredients",
-      "preferedIngredients",
-      "notIngredients",
-    ]),
+    ...mapGetters(["ingredients", "preferedIngredients", "notIngredients"]),
   },
 
-  created() {
+  mounted() {
     // this.page = this.$route.queryParams.page;
     // this.pageSize = this.$route.queryParams.pageSize;
     // this.ingredients = this.$route.queryParams.ingredients;
     // this.notIingredients = this.$route.queryParams.notIingredients;
     // this.queryName = this.$route.queryParams.queryName;
-
     this.seedRecipes();
     this.seedIngredients();
   },
 
   methods: {
     async seedRecipes() {
-      if (this.recipes() && this.recipes().length > 0) {
-        let queryParams = {
-          page: this.page,
-          pageSize: this.pageSize,
-          ingredients: this.ingredients(),
-          preferedIngredients: this.preferedIngredients(),
-          notIngredients: this.notIingredients(),
-          queryName: this.queryNamenotIngredients(),
-        };
-        await this.$store.dispatch("getRecipes", queryParams);
-      }
+      let queryParams = {
+        page: this.page,
+        pageSize: this.pageSize,
+      };
+
+      let response = await this.$store.dispatch("getRecipes", queryParams);
+      this.recipes = response.recipes;
+      this.prev = response.prev;
+      this.next = response.next;
+      this.first = response.first;
+      this.last = response.last;
       this.loadingRecipes = false;
     },
 
     async seedIngredients() {
-      if (this.ingredients() && this.ingredients().length > 0) {
+      if (this.ingredients.length == 0) {
         this.$store.dispatch("getIngredients");
       }
       this.loadingIngredients = false;
@@ -215,9 +210,9 @@ export default {
       let queryParams = {
         page: this.page,
         pageSize: this.pageSize,
-        ingredients: this.preferedIngredients(),
-        notIngredients: this.notIngredients(),
-        title: this.queryName(),
+        ingredients: this.preferedIngredients,
+        notIngredients: this.notIngredients,
+        title: this.queryName,
       };
 
       await this.$store.dispatch("getRecipes", queryParams);
@@ -230,9 +225,9 @@ export default {
       let queryParams = {
         pageSize: 3,
         page: 0,
-        title: this.queryName(),
-        ingredients: `[${this.preferedIngredients()}]`,
-        notIngredients: `[${this.notIngredients()}]`,
+        title: this.queryName,
+        ingredients: `[${this.preferedIngredients}]`,
+        notIngredients: `[${this.notIngredients}]`,
       };
 
       await this.$store.dispatch("getRecipes", queryParams);

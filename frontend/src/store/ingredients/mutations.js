@@ -1,5 +1,5 @@
 export default {
-  addIngredients(state, payload) {
+  addIngredient(state, payload) {
     state.ingredients.push(payload);
   },
 };

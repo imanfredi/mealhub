@@ -11,38 +11,51 @@
               <v-col cols="12" align="center">
                 <v-card color="#FFE8D6">
                   <v-card-text align="start" class="px-6">
-                    <b class="mr-3">Minutes: ~20</b
-                    ><b class="mr-2">Ingredients(4):</b>Eggs, Sugar, Salt,
-                    Pepper, Eggs, Sugar, Salt, Pepper, Eggs, Sugar, Salt,
-                    Pepper, Eggs, Sugar, Salt, Pepper
+                    <b class="mr-3">Minutes: ~{{ recipe.minutes }}</b
+                    ><b class="mr-2"
+                      >Ingredients({{ recipe.ingredients.length }}):</b
+                    ><span
+                      v-for="(ingredient, index) in recipe.ingredients"
+                      :key="index"
+                    >
+                      {{ ingredient }}
+
+                      <span v-if="index != recipe.ingredients.length - 1"
+                        >,</span
+                      >
+                    </span>
                     <v-divider class="my-3"></v-divider>
                     <b class="mr-3">Tags:</b>
-                    <v-chip outlined class="mr-1">Easy</v-chip>
-                    <v-chip outlined class="mr-1">Fast</v-chip>
-                    <v-chip outlined class="mr-1">Amazing</v-chip>
+                    <v-chip
+                      v-for="(tag, index) in recipe.tags"
+                      :key="index"
+                      outlined
+                      class="mr-1"
+                      >{{ tag }}</v-chip
+                    >
                   </v-card-text>
                 </v-card>
               </v-col>
               <v-col cols="12" align="center">
                 <v-card color="#FFE8D6">
                   <v-card-title>Description</v-card-title>
-                  <v-card-text align="start"
-                    >Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Vero dolores nam ut deserunt, in laborum inventore. Laborum
-                    dolores molestiae corporis labore saepe laudantium libero
-                    voluptates placeat corrupti, nostrum nesciunt
-                    incidunt.</v-card-text
-                  >
+                  <v-card-text align="start">{{
+                    recipe.description
+                  }}</v-card-text>
                 </v-card>
               </v-col>
               <v-col cols="12" align="center">
                 <v-card color="#FFE8D6">
                   <v-card-title>Nutritional Values</v-card-title>
                   <v-card-text align="center"
-                    ><b class="mx-6">Calories: 150</b
-                    ><b class="mx-6">Protein: 10g</b
-                    ><b class="mx-6">Carbs: 20g</b
-                    ><b class="mx-6">Sugar: 2g</b></v-card-text
+                    ><b class="mx-6"
+                      >Calories: {{ recipe.nutrition.calories }}</b
+                    ><b class="mx-6">Protein: {{ recipe.nutrition.protein }}g</b
+                    ><b class="mx-6"
+                      >Carbs: {{ recipe.nutrition.carbohydrates }}g</b
+                    ><b class="mx-6"
+                      >Sugar: {{ recipe.nutrition.sugar }}g</b
+                    ></v-card-text
                   >
                 </v-card>
               </v-col>
@@ -53,11 +66,14 @@
                     style="text-decoration: underline"
                     >Instructions</v-card-title
                   >
-                  <v-card-subtitle align="center">(12 steps)</v-card-subtitle>
-                  <v-card-text>
-                    <v-list-item> 1.Batir la harina con huevos </v-list-item>
-                    <v-list-item> 2. Poner al horno </v-list-item>
-                    <v-list-item> 3. Comer </v-list-item>
+                  <v-card-subtitle align="center"
+                    >({{ recipe.n_steps }} steps)</v-card-subtitle
+                  >
+                  <v-card-text
+                    v-for="(step, index) in recipe.steps"
+                    :key="index"
+                  >
+                    <v-list-item> {{ index }}. {{ step }} </v-list-item>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -72,7 +88,6 @@
 <script>
 export default {
   name: "Recipe",
-
   data() {
     return {
       headers: [
@@ -82,9 +97,24 @@ export default {
         { text: "Sugar (g)", value: "sugar" },
         { text: "Minutes", value: "minutes" },
       ],
+      recipe: this.$route.params.recipe,
     };
   },
-  components: {},
+  mounted() {
+    this.seedRecipe();
+  },
+
+  methods: {
+    async seedRecipe() {
+      (this.recipe);
+      let id = this.$route.params.id;
+      if (this.recipe == null) {
+        console.log("aaa");
+        let recipe = await this.$store.dispatch("getRecipesById", { id: id });
+        this.recipe = recipe;
+      }
+    },
+  },
 };
 </script>
 

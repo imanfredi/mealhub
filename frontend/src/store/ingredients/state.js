@@ -1,6 +1,6 @@
 const state = {
   ingredients: [],
-  preferedIngredient: [],
+  preferedIngredients: [],
   notIngredients: [],
 };
 

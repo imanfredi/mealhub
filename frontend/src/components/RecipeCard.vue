@@ -3,27 +3,33 @@
     elevation="2"
     outlined
     class="d-flex-column recipe_card"
-    to="/recipes/3"
+    :to="{ name: 'RecipeDetails', params: { id: recipe.id, recipe: recipe } }"
   >
-    <v-card-title>{{ recipe._title }}</v-card-title>
+    <v-card-title>{{ recipe.title }}</v-card-title>
     <v-card-subtitle style="text-overflow: ellipsis !important">
-      <div class="description_text">{{ recipe._description }}</div>
+      <div class="description_text">{{ recipe.description }}</div>
     </v-card-subtitle>
     <v-card-text class="d-flex justify-end">
-      <b class="mx-1">Calories</b> {{ recipe._nutrition.calories }}g
-      <b class="mx-1">Protein</b> {{ recipe._nutrition.calories }}g
-      <b class="mx-1">Carbs</b> {{ recipe._nutrition.carbohydrates }}g
-      <b class="mx-1">Sugar</b> {{ recipe._nutrition.sugar }}g
-      <b class="mx-1">Minutes</b> {{ recipe._minutes }}
+      <b class="mx-1">Calories</b> {{ recipe.nutrition.calories }}g
+      <b class="mx-1">Protein</b> {{ recipe.nutrition.calories }}g
+      <b class="mx-1">Carbs</b> {{ recipe.nutrition.carbohydrates }}g
+      <b class="mx-1">Sugar</b> {{ recipe.nutrition.sugar }}g
+      <b class="mx-1">Minutes</b> {{ recipe.minutes }}
     </v-card-text>
   </v-card>
 </template>
 
 <script>
+
 export default {
   name: "RecipeCard",
   props: ["recipe"],
+
 };
+
+
+
+
 </script>
 
 <style>

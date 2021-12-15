@@ -1,5 +1,3 @@
-const state = {
-  recipes: [],
-};
+const state = {};
 
 export default state;
