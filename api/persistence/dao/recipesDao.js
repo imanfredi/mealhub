@@ -59,13 +59,19 @@ class RecipesDao {
   }
 
   async getRecipesById(id) {
-    let aggregation = [
-      {
-        $match: {
-          _id: id,
+    let aggregation;
+    try {
+      aggregation = [
+        {
+          $match: {
+            _id: ObjectId(id),
+          },
         },
-      },
-    ];
+      ];
+    } catch (e) {
+      console.log("Invalid id");
+      return null;
+    }
 
     return await this._mongoDriver.executeQueryAggregated(
       aggregation,

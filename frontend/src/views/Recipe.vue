@@ -3,7 +3,7 @@
     <v-row class="ma-0">
       <v-col cols="12" align="center" justify="center">
         <v-card color="#F1FAEE" width="700px" min-height="800px">
-          <v-container fill-height fluid>
+          <v-container fill-height fluid v-if="!loadingRecipe">
             <v-row>
               <v-col cols="12" align="center">
                 <h1 style="text-decoration: underline">Recipe</h1>
@@ -28,7 +28,7 @@
                     <b class="mr-3">Tags:</b>
                     <v-chip
                       v-for="(tag, index) in recipe.tags"
-                      :key="index"
+                      :key="'tag' + index"
                       outlined
                       class="mr-1"
                       >{{ tag }}</v-chip
@@ -71,7 +71,7 @@
                   >
                   <v-card-text
                     v-for="(step, index) in recipe.steps"
-                    :key="index"
+                    :key="'step' + index"
                   >
                     <v-list-item> {{ index }}. {{ step }} </v-list-item>
                   </v-card-text>
@@ -79,6 +79,7 @@
               </v-col>
             </v-row>
           </v-container>
+          <v-container else> </v-container>
         </v-card>
       </v-col>
     </v-row>
@@ -98,6 +99,7 @@ export default {
         { text: "Minutes", value: "minutes" },
       ],
       recipe: this.$route.params.recipe,
+      loadingRecipe: true,
     };
   },
   mounted() {
@@ -106,13 +108,12 @@ export default {
 
   methods: {
     async seedRecipe() {
-      (this.recipe);
       let id = this.$route.params.id;
       if (this.recipe == null) {
-        console.log("aaa");
         let recipe = await this.$store.dispatch("getRecipesById", { id: id });
         this.recipe = recipe;
       }
+      this.loadingRecipe = false;
     },
   },
 };

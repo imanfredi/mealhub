@@ -92,32 +92,35 @@
       <v-col cols="6" class="d-flex-column align-center">
         <v-card height="620px" color="#F1FAEE">
           <v-container v-if="!loadingRecipes">
-            <v-row>
-              <v-col cols="12" class="pt-7">
-                <v-data-table
-                  :headers="headers"
-                  class="elevation-1"
-                  disable-filtering
-                  disable-pagination
-                  hide-default-footer
-                  no-data-text
-                ></v-data-table>
-              </v-col>
-            </v-row>
-            <v-row v-for="(recipe, index) in recipes" :key="index">
-              <v-col cols="12">
-                <RecipeCard :recipe="recipe"></RecipeCard>
-              </v-col>
-            </v-row>
-            <v-pagination
-              @input="onPageChange($event)"
-              :length="last"
-              color="#A8DADC"
-              v-model="page"
-              :total-visible="visible"
-              class="mt-5"
-            >
-            </v-pagination>
+            <v-container v-if="recipes.length > 0">
+              <v-row>
+                <v-col cols="12" class="pt-7">
+                  <v-data-table
+                    :headers="headers"
+                    class="elevation-1"
+                    disable-filtering
+                    disable-pagination
+                    hide-default-footer
+                    no-data-text
+                  ></v-data-table>
+                </v-col>
+              </v-row>
+              <v-row v-for="(recipe, index) in recipes" :key="index">
+                <v-col cols="12">
+                  <RecipeCard :recipe="recipe"></RecipeCard>
+                </v-col>
+              </v-row>
+              <v-pagination
+                @input="onPageChange($event)"
+                :length="last"
+                color="#A8DADC"
+                v-model="page"
+                :total-visible="visible"
+                class="mt-5"
+              >
+              </v-pagination>
+            </v-container>
+            <v-container v-else> There is no recipes to show </v-container>
           </v-container>
           <v-container v-else>
             <v-progress-circular
@@ -150,6 +153,8 @@ export default {
         { text: "Minutes", value: "minutes" },
       ],
       recipes: [],
+      preferedIngredients: [],
+      notIngredients: [],
       loadingRecipes: true,
       loadingIngredients: true,
       first: 0,
@@ -167,7 +172,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["ingredients", "preferedIngredients", "notIngredients"]),
+    ...mapGetters(["ingredients"]),
   },
 
   mounted() {
@@ -176,6 +181,8 @@ export default {
     // this.ingredients = this.$route.queryParams.ingredients;
     // this.notIingredients = this.$route.queryParams.notIingredients;
     // this.queryName = this.$route.queryParams.queryName;
+    this.preferedIngredients = this.$store.getters.preferedIngredients;
+    this.notIngredients = this.$store.getters.notIngredients;
     this.seedRecipes();
     this.seedIngredients();
   },
@@ -188,12 +195,7 @@ export default {
       };
 
       let response = await this.$store.dispatch("getRecipes", queryParams);
-      this.recipes = response.recipes;
-      this.prev = response.prev;
-      this.next = response.next;
-      this.first = response.first;
-      this.last = response.last;
-      this.loadingRecipes = false;
+      this.updateView(response);
     },
 
     async seedIngredients() {
@@ -215,12 +217,14 @@ export default {
         title: this.queryName,
       };
 
-      await this.$store.dispatch("getRecipes", queryParams);
-      this.loadingRecipes = false;
+      let response = await this.$store.dispatch("getRecipes", queryParams);
+      this.updateView(response);
     },
 
     async search() {
       this.loadingRecipes = true;
+      this.$store.commit("updatePreferedIngredients", this.preferedIngredients);
+      this.$store.commit("updateNotIngredients", this.notIngredients);
 
       let queryParams = {
         pageSize: 3,
@@ -230,7 +234,19 @@ export default {
         notIngredients: `[${this.notIngredients}]`,
       };
 
-      await this.$store.dispatch("getRecipes", queryParams);
+      let response = await this.$store.dispatch("getRecipes", queryParams);
+      console.log(response.recipes);
+
+      this.updateView(response);
+      console.log(this.loadingRecipes);
+    },
+
+    updateView(response) {
+      this.recipes = response.recipes;
+      this.prev = response.prev;
+      this.next = response.next;
+      this.first = response.first;
+      this.last = response.last;
       this.loadingRecipes = false;
     },
   },

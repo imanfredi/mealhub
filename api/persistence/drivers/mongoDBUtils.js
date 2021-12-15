@@ -30,20 +30,20 @@ class MongoDriver {
     await this._client.close();
   }
 
-
-
   async executeQueryAggregated(query, collection) {
-    return this._db
-            .collection(collection)
-            .aggregate(query).toArray();
+    let response;
+    try {
+      response = this._db.collection(collection).aggregate(query).toArray();
+    } catch (e) {
+      console.log("Invalid query");
+    }
+    return response;
   }
-
 }
 
 const mongoDriver = new MongoDriver();
 module.exports = async () => {
   if (!mongoDriver._isInitialized) {
-
     mongoDriver._isInitialized = true;
     await mongoDriver._init();
 

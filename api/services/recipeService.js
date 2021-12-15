@@ -17,14 +17,9 @@ class RecipeService {
     return await this._recipesDao.getRecipes(page, pageSize);
   }
 
-  async getRecipesByName(name){
-      return await this._recipesDao.getRecipesByName(name);
+  async getRecipesById(id) {
+    return await this._recipesDao.getRecipesById(id);
   }
-
-  async getRecipesById(id){
-    
-  }
-
 }
 
 let recipeService = new RecipeService();

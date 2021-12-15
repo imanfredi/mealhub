@@ -8,25 +8,32 @@ export default {
       let response = await axios.get(
         `${context.getters.baseURL}/recipes?` + new URLSearchParams(params)
       );
-      let pagination = parseLink(response.headers.link);
+      let pagination;
+      if (response.status == 200) {
+        pagination = parseLink(response.headers.link);
+      }
       return {
         recipes: response.data,
         ...pagination,
       };
     } catch (error) {
       console.log(error);
+      //FIXME: lanzar error
+
       return null;
     }
   },
 
   async getRecipesById(context, payload) {
     try {
+      console.log(`${context.getters.baseURL}/recipes/` + payload.id);
       let response = await axios.get(
-        `${context.getters.baseUrl}/recipes/` + payload.id
+        `${context.getters.baseURL}/recipes/` + payload.id
       );
-      return response.data;
+      return response.data[0];
     } catch (error) {
       console.log(error);
+      // throw new Error() //FIXME:
       return null;
     }
   },

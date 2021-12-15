@@ -6,8 +6,14 @@ const Recipe = require("../models/Recipe");
 const orderByOptions = require("../models/RecipeOrderByOptions");
 
 let searchService;
+let recipeService;
+
 require("../services/searchService")().then(
   (service) => (searchService = service)
+);
+
+require("../services/recipeService")().then(
+  (service) => (recipeService = service)
 );
 
 let defaultPage = 0;
@@ -53,22 +59,24 @@ router.get("/", async (req, res) => {
   createPaginationResponse(res, results, url);
 });
 
-router.get("/:id", (req, res) => {
-  query = req.query.id;
+router.get("/:id", async (req, res) => {
+  let id = req.params.id;
+
+  if (!id) {
+    return res.status(400).send();
+  }
+
+  let recipe = await recipeService.getRecipesById(id);
+
+  if (recipe == null) {
+    return res.status(400).send();
+  } else if (recipe.length == 0) {
+    return res.status(404).send();
+  }
+
+  res.send(recipe);
 
   //GET recipe with id
-});
-
-router.post("/", (req, res) => {
-  //POST recipe
-});
-
-router.patch("/:id", (req, res) => {
-  //UPDATE recipe
-});
-
-router.delete("/:id", (req, res) => {
-  //DELETE recipe
 });
 
 function buildUrl(uri, req) {
