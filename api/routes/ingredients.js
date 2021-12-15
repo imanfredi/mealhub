@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
   let results = await ingredientsService.getIngredients();
 
   if (results == null) {
-    return res.status(400).send(); //FIXME: BAD REQUEST
+    return res.status(404).send("Ingredients not found"); //FIXME: BAD REQUEST
   }
   // res.send(results);
   res.send(results);

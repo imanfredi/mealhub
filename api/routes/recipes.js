@@ -40,7 +40,7 @@ router.get("/", async (req, res) => {
   );
 
   if (results == null) {
-    return res.status(400).send(); //FIXME: BAD REQUEST
+    return res.status(404).send("Recipes not found"); //FIXME: BAD REQUEST
   }
 
   let url =
@@ -63,7 +63,7 @@ router.get("/:id", async (req, res) => {
   let id = req.params.id;
 
   if (!id) {
-    return res.status(400).send();
+    return res.status(400).send("ID is missing");
   }
 
   let recipe = await recipeService.getRecipesById(id);
@@ -71,7 +71,7 @@ router.get("/:id", async (req, res) => {
   if (recipe == null) {
     return res.status(400).send();
   } else if (recipe.length == 0) {
-    return res.status(404).send();
+    return res.status(404).send(`Recipe with ${id} not found`);
   }
 
   res.send(recipe);
