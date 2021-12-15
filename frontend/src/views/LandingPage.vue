@@ -3,90 +3,95 @@
     <v-row>
       <v-col cols="5">
         <v-card color="#F1FAEE" class="ml-16 pt-5 px-4">
-          <v-container v-if="!loadingIngredients" fill-height fuild>
-            <v-row align="center" justify="center">
-              <v-col cols="12">
-                <v-text-field
-                  label="Buscá la receta que quieras"
-                  solo
-                  v-model="queryName"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" class="pb-0 pt-0">
-                <p class="text-center font-weight-medium strong mb-2">
-                  Ingredients
-                </p>
-              </v-col>
-            </v-row>
-            <v-row align="center" justify="center">
-              <v-col cols="4" class="pt-0">
-                <hr style="margin: auto" />
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" class="pb-0 pt-0">
-                <v-autocomplete
-                  chips
-                  clearable
-                  deletable-chips
-                  multiple
-                  small-chips
-                  solo
-                  :items="ingredients"
-                  v-model="preferedIngredients"
-                ></v-autocomplete>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" class="pb-0 pt-0">
-                <p class="text-center font-weight-medium strong mb-2">
-                  Not Ingredients
-                </p>
-              </v-col>
-            </v-row>
-            <v-row align="center" justify="center">
-              <v-col cols="4" class="pt-0">
-                <hr style="margin: auto" />
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" class="pb-0 pt-0">
-                <v-autocomplete
-                  chips
-                  clearable
-                  deletable-chips
-                  multiple
-                  :items="ingredients"
-                  v-model="notIngredients"
-                  small-chips
-                  solo
-                ></v-autocomplete>
-              </v-col>
-            </v-row>
-            <v-row align="center" justify="center">
-              <v-col cols="12" class="text-center">
-                <v-btn
-                  @click="search"
-                  color="#A8DADC"
-                  align="center"
-                  rounded
-                  dark
-                >
-                  Buscar
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-container>
-          <v-container v-else fill-height fuild>
-            <v-progress-circular
-              :size="70"
-              :width="7"
-              color="#A8DADC"
-              indeterminate
-            ></v-progress-circular>
-          </v-container>
+          <v-form v-model="valid">
+            <v-container v-if="!loadingIngredients" fill-height fuild>
+              <v-row align="center" justify="center">
+                <v-col cols="12">
+                  <v-text-field
+                    label="Search for any recipe"
+                    solo
+                    :counter="20"
+                    v-model="queryName"
+                    :rules="queryRules"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" class="pb-0 pt-0">
+                  <p class="text-center font-weight-medium strong mb-2">
+                    Ingredients
+                  </p>
+                </v-col>
+              </v-row>
+              <v-row align="center" justify="center">
+                <v-col cols="4" class="pt-0">
+                  <hr style="margin: auto" />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" class="pb-0 pt-0">
+                  <v-autocomplete
+                    chips
+                    clearable
+                    deletable-chips
+                    multiple
+                    small-chips
+                    solo
+                    :items="ingredients"
+                    v-model="preferedIngredients"
+                  ></v-autocomplete>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" class="pb-0 pt-0">
+                  <p class="text-center font-weight-medium strong mb-2">
+                    Not Ingredients
+                  </p>
+                </v-col>
+              </v-row>
+              <v-row align="center" justify="center">
+                <v-col cols="4" class="pt-0">
+                  <hr style="margin: auto" />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" class="pb-0 pt-0">
+                  <v-autocomplete
+                    chips
+                    clearable
+                    deletable-chips
+                    multiple
+                    :items="ingredients"
+                    v-model="notIngredients"
+                    small-chips
+                    solo
+                  ></v-autocomplete>
+                </v-col>
+              </v-row>
+              <v-row align="center" justify="center">
+                <v-col cols="12" class="text-center">
+                  <v-btn
+                    @click="search"
+                    color="#A8DADC"
+                    align="center"
+                    rounded
+                    dark
+                    :class="btnClass"
+                  >
+                    Buscar
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-container>
+            <v-container v-else fill-height fuild>
+              <v-progress-circular
+                :size="70"
+                :width="7"
+                color="#A8DADC"
+                indeterminate
+              ></v-progress-circular>
+            </v-container>
+          </v-form>
         </v-card>
       </v-col>
       <v-col cols="6" class="d-flex-column align-center">
@@ -165,6 +170,11 @@ export default {
       visible: 5,
       queryName: "",
       pageSize: 3,
+      valid: false,
+      isActive: false,
+      queryRules: [
+        (v) => v.length <= 20 || "Recipe must be less than 20 characters",
+      ],
     };
   },
   components: {
@@ -173,8 +183,18 @@ export default {
 
   computed: {
     ...mapGetters(["ingredients"]),
+    btnClass() {
+      if (
+        this.preferedIngredients.length == 0 &&
+        this.notIngredients.length == 0 &&
+        this.queryName === ""
+      ) {
+        return "disableButton";
+      } else {
+        return "";
+      }
+    },
   },
-
   mounted() {
     // this.page = this.$route.queryParams.page;
     // this.pageSize = this.$route.queryParams.pageSize;
@@ -249,6 +269,7 @@ export default {
       this.last = response.last;
       this.loadingRecipes = false;
     },
+    isDisabled() {},
   },
 };
 </script>
@@ -260,5 +281,14 @@ export default {
 }
 .v-data-table__empty-wrapper {
   display: none !important;
+}
+.v-list {
+  max-width: 400px !important;
+}
+.disableButton {
+  border: 1px solid #999999 !important;
+  background-color: #cccccc !important;
+  color: #666666 !important;
+  pointer-events: none !important;
 }
 </style>
