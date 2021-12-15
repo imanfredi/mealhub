@@ -3,7 +3,16 @@
     <v-row>
       <v-col cols="5">
         <v-card color="#F1FAEE" class="ml-16 pt-5 px-4">
-          <v-container fill-height fuild>
+          <v-container v-if="!loadingIngredients" fill-height fuild>
+            <v-row align="center" justify="center">
+              <v-col cols="12">
+                <v-text-field
+                  label="Buscá la receta que quieras"
+                  solo
+                  v-model="queryName"
+                ></v-text-field>
+              </v-col>
+            </v-row>
             <v-row>
               <v-col cols="12" class="pb-0 pt-0">
                 <p class="text-center font-weight-medium strong mb-2">
@@ -25,6 +34,8 @@
                   multiple
                   small-chips
                   solo
+                  :items="ingredients"
+                  v-model="preferedIngredients"
                 ></v-autocomplete>
               </v-col>
             </v-row>
@@ -47,11 +58,34 @@
                   clearable
                   deletable-chips
                   multiple
+                  :items="ingredients"
+                  v-model="notIngredients"
                   small-chips
                   solo
                 ></v-autocomplete>
               </v-col>
             </v-row>
+            <v-row align="center" justify="center">
+              <v-col cols="12" class="text-center">
+                <v-btn
+                  @click="search"
+                  color="#A8DADC"
+                  align="center"
+                  rounded
+                  dark
+                >
+                  Buscar
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-container>
+          <v-container v-else fill-height fuild>
+            <v-progress-circular
+              :size="70"
+              :width="7"
+              color="#A8DADC"
+              indeterminate
+            ></v-progress-circular>
           </v-container>
         </v-card>
       </v-col>
@@ -79,6 +113,7 @@
               @input="onPageChange($event)"
               :length="last"
               circle
+              color="#A8DADC"
               v-model="page"
               :total-visible="visible"
               class="mt-5"
@@ -89,7 +124,7 @@
             <v-progress-circular
               :size="70"
               :width="7"
-              color="purple"
+              color="#A8DADC"
               indeterminate
             ></v-progress-circular>
           </v-container>
@@ -101,7 +136,7 @@
 
 <script>
 import RecipeCard from "../components/RecipeCard.vue";
-import axios from "axios";
+import { mapGetters } from "vuex";
 
 export default {
   name: "LandingPage",
@@ -115,85 +150,93 @@ export default {
         { text: "Sugar (g)", value: "sugar" },
         { text: "Minutes", value: "minutes" },
       ],
-      recipes: [],
-      ingredients: [],
-      loadingRecipes: false,
+      loadingRecipes: true,
+      loadingIngredients: true,
       first: Number,
       last: Number,
       next: Number,
       prev: Number,
       page: 1,
       visible: 5,
+      queryName: "",
     };
   },
   components: {
     RecipeCard,
   },
 
-  created() {
-    axios
-      .get(process.env.VUE_APP_BASE_API_URL + "/recipes?pageSize=3&page=0")
-      .then((response) => {
-        this.recipes = response.data;
-        this.parseLink(response.headers.link);
-        this.loadingRecipes = true;
-      });
+  computed: {
+    ...mapGetters([
+      "recipes",
+      "ingredients",
+      "preferedIngredients",
+      "notIngredients",
+    ]),
+  },
 
-    // axios
-    //   .get(process.env.VUE_APP_BASE_API_URL + "/ingredients")
-    //   .then((response) => {
-    //     this.ingredients = response.data;
-    //     console.log(response.headers.get("Link"));
-    //   });
+  created() {
+    // this.page = this.$route.queryParams.page;
+    // this.pageSize = this.$route.queryParams.pageSize;
+    // this.ingredients = this.$route.queryParams.ingredients;
+    // this.notIingredients = this.$route.queryParams.notIingredients;
+    // this.queryName = this.$route.queryParams.queryName;
+
+    this.seedRecipes();
+    this.seedIngredients();
   },
 
   methods: {
-    parseLink(linkHeader) {
-      let pagination = {};
-
-      let links = linkHeader.split(",");
-
-      for (const link of links) {
-        let aux = link.split(";");
-        let url = new URL(aux[0]);
-
-        if (aux[1] == " rel=first") {
-          pagination.first = parseInt(url.searchParams.get("page"));
-        } else if (aux[1] == " rel=last") {
-          pagination.last = parseInt(url.searchParams.get("page"));
-        } else if (aux[1] == " rel=prev") {
-          pagination.prev = parseInt(url.searchParams.get("page"));
-        } else {
-          pagination.next = parseInt(url.searchParams.get("page"));
-        }
-        if (pagination.prev == null) {
-          pagination.prev = pagination.first;
-        }
-        if (pagination.next == null) {
-          pagination.next = pagination.last;
-        }
-        pagination.total = pagination.last;
-        this.last = pagination.last;
-        this.first = pagination.first;
-        this.next = pagination.next;
-        this.prev = pagination.prev;
+    async seedRecipes() {
+      if (this.recipes() && this.recipes().length > 0) {
+        let queryParams = {
+          page: this.page,
+          pageSize: this.pageSize,
+          ingredients: this.ingredients(),
+          preferedIngredients: this.preferedIngredients(),
+          notIngredients: this.notIingredients(),
+          queryName: this.queryNamenotIngredients(),
+        };
+        await this.$store.dispatch("getRecipes", queryParams);
       }
+      this.loadingRecipes = false;
     },
 
-    onPageChange(page) {
-      console.log("aata");
+    async seedIngredients() {
+      if (this.ingredients() && this.ingredients().length > 0) {
+        this.$store.dispatch("getIngredients");
+      }
+      this.loadingIngredients = false;
+    },
+
+    async onPageChange(page) {
+      this.loadingRecipes = true;
+      this.page = page;
+
+      let queryParams = {
+        page: this.page,
+        pageSize: this.pageSize,
+        ingredients: this.preferedIngredients(),
+        notIngredients: this.notIngredients(),
+        title: this.queryName(),
+      };
+
+      await this.$store.dispatch("getRecipes", queryParams);
       this.loadingRecipes = false;
-      axios
-        .get(
-          process.env.VUE_APP_BASE_API_URL +
-            "/recipes?pageSize=3&page=" +
-            (page - 1)
-        )
-        .then((response) => {
-          this.recipes = response.data;
-          this.parseLink(response.headers.link);
-          this.loadingRecipes = true;
-        });
+    },
+
+    async search() {
+      this.loadingRecipes = true;
+
+      let queryParams = {
+        pageSize: 3,
+        page: 0,
+        title: this.queryName(),
+        ingredients: `[${this.preferedIngredients()}]`,
+        notIngredients: `[${this.notIngredients()}]`,
+      };
+
+      await this.$store.dispatch("getRecipes", queryParams);
+      this.loadingRecipes = false;
     },
   },
 };

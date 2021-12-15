@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
     return res.status(400).send(); //FIXME: BAD REQUEST
   }
   // res.send(results);
-  res.send();
+  res.send(results);
 });
 
 module.exports = router;

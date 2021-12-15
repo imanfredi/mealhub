@@ -22,10 +22,10 @@ router.get("/", async (req, res) => {
   filterByNotIngredients =
     req.query.notIngredients != null ? [req.query.notIngredients].flat() : null;
   orderBy = req.query.orderBy || defaultOrderBy;
-  let searchByName = req.query.searchByName;
+  let name = req.query.name;
 
   let results = await searchService.getRecipes(
-    searchByName,
+    name,
     filterByIngredients,
     filterByNotIngredients,
     orderBy,
