@@ -56,7 +56,7 @@
         </v-card>
       </v-col>
       <v-col cols="6" class="d-flex-column align-center">
-        <v-card height="600px" color="#F1FAEE">
+        <v-card height="620px" color="#F1FAEE">
           <v-container v-if="loadingRecipes">
             <v-row>
               <v-col cols="12" class="pt-7">
@@ -81,6 +81,7 @@
               circle
               v-model="page"
               :total-visible="visible"
+              class="mt-5"
             >
             </v-pagination>
           </v-container>
