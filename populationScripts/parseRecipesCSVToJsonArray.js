@@ -1,6 +1,6 @@
 const csv = require("csv-parser");
 const fs = require("fs");
-const path = "./recipesAndInteractions/";
+const path = "./";
 const fileName = "RAW_recipes.csv";
 const filePath = path + fileName;
 const outFileName = "recipes.json";
@@ -35,7 +35,7 @@ async function main() {
       tags[tags.length - 1] = tags.at(-1).slice(0, -1);
 
       let recipe = {
-        title: row.name.trim().replace(/\s\s+/g, ' '),
+        title: row.name.trim().replace(/\s\s+/g, " "),
         description: row.description,
         ingredients: ingredients,
         n_ingredients: parseInt(row.n_ingredients),
@@ -44,7 +44,6 @@ async function main() {
         minutes: parseInt(row.minutes),
         tags: tags,
         nutrition: {
-         
           calories: parseFloat(nutrition[0]),
           totalFat: parseFloat(nutrition[1]),
           sugar: parseFloat(nutrition[2]),
@@ -55,25 +54,13 @@ async function main() {
         },
       };
 
-      if (count != 0) {
-        await fs.appendFile(outFileName, "," + JSON.stringify(recipe), (err) => {
-          if (err) {
-            console.error(err);
-            return;
-          }
-          //done!
-        });
-      } else {
-        await fs.appendFile(outFileName, JSON.stringify(recipe), (err) => {
-          if (err) {
-            console.error(err);
-            return;
-          }
-          //done!
-        });
-      }
-
-      count++;
+      await fs.appendFile(outFileName, "," + JSON.stringify(recipe), (err) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        //done!
+      });
     })
     .on("end", async () => {
       await fs.appendFile(outFileName, "]", (err) => {
@@ -83,8 +70,20 @@ async function main() {
         }
         //done!
       });
+
       console.log(count);
     });
+
+  fs.readFile(outFileName, "utf8", function (err, data) {
+    if (err) {
+      return console.log(err);
+    }
+    var result = data.replace(",", "");
+
+    fs.writeFile(outFileName, result, "utf8", function (err) {
+      if (err) return console.log(err);
+    });
+  });
 }
 
 (async () => {
