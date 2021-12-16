@@ -29,7 +29,7 @@ class RecipesDao {
       filterByIngredients,
       filterByNotIngredients
     );
-    return (await this._neo4jDriver).executeQueryCount(query);
+    return await this._neo4jDriver.executeQueryCount(query);
   }
 
   async getRecipes(
@@ -100,10 +100,13 @@ class RecipesDao {
     }
     query += "WITH r ";
 
-    if (filterByNotIngredients || filterByIngredients) {
+    if (
+      this.hasPreferedIngredients(filterByIngredients) ||
+      this.hasNotPreferedIngredients(filterByNotIngredients)
+    ) {
       query += ", collect(i.name) as r_ingredients, ";
 
-      if (filterByIngredients) {
+      if (this.hasPreferedIngredients(filterByIngredients)) {
         let aux = "[";
 
         for (var i = 0; i < filterByIngredients.length; i++) {
@@ -116,12 +119,12 @@ class RecipesDao {
 
         query += `${aux} as ingredients WHERE apoc.coll.containsAll(r_ingredients, ingredients) `;
 
-        if (filterByNotIngredients) {
+        if (this.hasNotPreferedIngredients(filterByNotIngredients)) {
           query += "WITH r, r_ingredients, ";
         }
       }
 
-      if (filterByNotIngredients) {
+      if (this.hasNotPreferedIngredients(filterByNotIngredients)) {
         let aux = "[";
 
         for (var i = 0; i < filterByNotIngredients.length; i++) {
@@ -175,10 +178,13 @@ class RecipesDao {
     }
     query += "WITH r ";
 
-    if (filterByNotIngredients || filterByNotIngredients) {
+    if (
+      this.hasPreferedIngredients(filterByIngredients) ||
+      this.hasNotPreferedIngredients(filterByNotIngredients)
+    ) {
       query += ", collect(i.name) as r_ingredients, ";
 
-      if (filterByIngredients) {
+      if (this.hasPreferedIngredients(filterByIngredients)) {
         let aux = "[";
 
         for (var i = 0; i < filterByIngredients.length; i++) {
@@ -189,12 +195,12 @@ class RecipesDao {
         aux += "]";
         query += `${aux} as ingredients WHERE apoc.coll.containsAll(r_ingredients, ingredients) `;
 
-        if (filterByNotIngredients) {
+        if (this.hasNotPreferedIngredients(filterByNotIngredients)) {
           query += "WITH r, r_ingredients, ";
         }
       }
 
-      if (filterByNotIngredients) {
+      if (this.hasNotPreferedIngredients(filterByNotIngredients)) {
         let aux = "[";
 
         for (var i = 0; i < filterByNotIngredients.length; i++) {
@@ -210,7 +216,6 @@ class RecipesDao {
     }
 
     query += "RETURN count(DISTINCT r)";
-
     return query;
   }
 
@@ -253,6 +258,22 @@ class RecipesDao {
     ];
 
     return aggregation;
+  }
+
+  hasPreferedIngredients(filterByIngredients) {
+    return (
+      filterByIngredients &&
+      filterByIngredients.length > 0 &&
+      filterByIngredients[0] != ""
+    );
+  }
+
+  hasNotPreferedIngredients(filterByNotIngredients) {
+    return (
+      filterByNotIngredients &&
+      filterByNotIngredients.length > 0 &&
+      filterByNotIngredients[0] != ""
+    );
   }
 }
 

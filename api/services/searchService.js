@@ -46,6 +46,10 @@ class SearchService {
       filterByIngredients,
       filterByNotIngredients
     );
+    console.log(totalRecipes);
+    if (totalRecipes == null) {
+      return null;
+    }
     let totalPages = Math.ceil(totalRecipes / pageSize);
 
     //No hay ninguna receta o la pagina solicitada no tiene resultados porque no hay suficiente cantidad

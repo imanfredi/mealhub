@@ -29,22 +29,31 @@ class Neo4JDriver {
   }
 
   async executeQuery(query) {
-    let aux = await this._driver
-      .session()
-      .readTransaction((txc) => txc.run(query));
-    let results = [];
-    aux.records.map((record) => {
-      results.push(record._fields[0].properties);
-    });
-    return results;
+    try {
+      let aux = await this._driver
+        .session()
+        .readTransaction((txc) => txc.run(query));
+      let results = [];
+      aux.records.map((record) => {
+        results.push(record._fields[0].properties);
+      });
+      return results;
+    } catch (e) {
+      return null;
+      //FIXME loggear
+    }
   }
 
   async executeQueryCount(query) {
-    let aux = await this._driver
-      .session()
-      .readTransaction((txc) => txc.run(query));
-
-    return parseInt(aux.records[0]._fields[0].toString());
+    try {
+      let aux = await this._driver
+        .session()
+        .readTransaction((txc) => txc.run(query));
+      return parseInt(aux.records[0]._fields[0].toString());
+    } catch (e) {
+      //FIXME: loggear
+      return null;
+    }
   }
 }
 

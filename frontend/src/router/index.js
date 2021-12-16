@@ -10,7 +10,11 @@ const routes = [
     children: [
       {
         path: "",
-        name: "landingPage",
+        redirect: "/Home",
+      },
+      {
+        path: "/Home",
+        name: "Home",
         component: () => import("../views/LandingPage"),
       },
       {
@@ -20,6 +24,15 @@ const routes = [
           recipe: route.params.recipe,
         }),
         component: () => import("../views/Recipe"),
+      },
+      {
+        name: "Error",
+        path: "*",
+        props: (route) => ({
+          message: route.params.message || "Not found",
+          statusCode: route.params.statusCode || 404,
+        }),
+        component: () => import("../views/Error"),
       },
     ],
   },

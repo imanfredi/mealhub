@@ -2,12 +2,13 @@ import axios from "axios";
 
 export default {
   async getRecipes(context, payload) {
-    let params = buildParams(payload);
-
     try {
+      let params = buildParams(payload);
+
       let response = await axios.get(
-        `${context.getters.baseURL}/recipes?` + new URLSearchParams(params)
+        `${context.getters.baseURL}/recipes?` + params
       );
+
       let pagination;
       if (response.status == 200) {
         pagination = parseLink(response.headers.link);
@@ -17,10 +18,8 @@ export default {
         ...pagination,
       };
     } catch (error) {
-      console.log(error);
+      throw new Error(error);
       //FIXME: lanzar error
-
-      return null;
     }
   },
 
@@ -33,8 +32,7 @@ export default {
       return response.data[0];
     } catch (error) {
       console.log(error);
-      // throw new Error() //FIXME:
-      return null;
+      throw new Error(error);
     }
   },
 };
@@ -44,6 +42,7 @@ function parseLink(linkHeader) {
   let links = linkHeader.split(",");
   for (const link of links) {
     let aux = link.split(";");
+
     let url = new URL(aux[0]);
     if (aux[1] == " rel=first") {
       pagination.first = parseInt(url.searchParams.get("page"));
@@ -66,21 +65,37 @@ function parseLink(linkHeader) {
 }
 
 function buildParams(payload) {
-  let params = {
-    pageSize: payload.pageSize,
-    page: payload.page,
-  };
+  let params = new URLSearchParams();
+  params.append("pageSize", payload.pageSize);
+  params.append("page", payload.page);
 
   if (payload.queryName) {
-    params.queryName = payload.queryName;
+    params.append("queryName", payload.queryName);
   }
-
   if (payload.ingredients) {
-    params.ingredients = payload.ingredients;
+    let ingredients = payload.ingredients;
+    if (Array.isArray(payload.ingredients) && payload.ingredients.length > 1) {
+      for (const ing of ingredients) {
+        params.append("ingredients", ing);
+      }
+    } else {
+      params.append("ingredients", payload.ingredients);
+    }
   }
 
   if (payload.notIngredients) {
-    params.notIngredients = payload.notIngredients;
+    let notIngredients = payload.notIngredients;
+    if (
+      Array.isArray(payload.notIngredients) &&
+      payload.notIngredients.length > 1
+    ) {
+      for (const ing of notIngredients) {
+        params.append("notIngredients", ing);
+      }
+    } else {
+      params.append("notIngredients", payload.notIngredients);
+    }
   }
+
   return params;
 }

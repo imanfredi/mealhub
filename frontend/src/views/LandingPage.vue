@@ -196,11 +196,6 @@ export default {
     },
   },
   mounted() {
-    // this.page = this.$route.queryParams.page;
-    // this.pageSize = this.$route.queryParams.pageSize;
-    // this.ingredients = this.$route.queryParams.ingredients;
-    // this.notIingredients = this.$route.queryParams.notIingredients;
-    // this.queryName = this.$route.queryParams.queryName;
     this.preferedIngredients = this.$store.getters.preferedIngredients;
     this.notIngredients = this.$store.getters.notIngredients;
     this.seedRecipes();
@@ -209,10 +204,12 @@ export default {
 
   methods: {
     async seedRecipes() {
-      let queryParams = {
-        page: this.page,
-        pageSize: this.pageSize,
-      };
+      let queryParams = this.getQueryParams();
+
+      this.$router.push({
+        path: this.$route.path,
+        query: { ...queryParams },
+      });
 
       let response = await this.$store.dispatch("getRecipes", queryParams);
       this.updateView(response);
@@ -230,12 +227,25 @@ export default {
       this.page = page;
 
       let queryParams = {
-        page: this.page,
-        pageSize: this.pageSize,
-        ingredients: this.preferedIngredients,
-        notIngredients: this.notIngredients,
-        title: this.queryName,
+        page: this.page - 1,
+        pageSize: this.$route.query.pageSize || this.pageSize,
+        ingredients:
+          this.$route.query.ingredients || this.preferedIngredients.length > 0
+            ? this.preferedIngredients
+            : "",
+        notIngredients:
+          this.$route.query.notIngredients || this.notIngredients.length > 0
+            ? this.preferedIngredients
+            : "",
+        queryName: this.$route.query.queryName || this.queryName || "",
       };
+
+      this.$router.push({
+        path: this.$route.path,
+        query: { ...queryParams },
+      });
+
+      console.log(queryParams);
 
       let response = await this.$store.dispatch("getRecipes", queryParams);
       this.updateView(response);
@@ -245,20 +255,25 @@ export default {
       this.loadingRecipes = true;
       this.$store.commit("updatePreferedIngredients", this.preferedIngredients);
       this.$store.commit("updateNotIngredients", this.notIngredients);
-
+      if (this.page != 0) {
+        this.page = 1;
+      }
       let queryParams = {
-        pageSize: 3,
-        page: 0,
-        title: this.queryName,
-        ingredients: `[${this.preferedIngredients}]`,
-        notIngredients: `[${this.notIngredients}]`,
+        pageSize: this.pageSize,
+        page: this.page - 1,
+        queryName: this.queryName || "",
+        ingredients: this.preferedIngredients || "",
+        notIngredients: this.notIngredients || "",
       };
 
+      this.$router.push({
+        path: this.$route.path,
+        query: { ...queryParams },
+      });
+
       let response = await this.$store.dispatch("getRecipes", queryParams);
-      console.log(response.recipes);
 
       this.updateView(response);
-      console.log(this.loadingRecipes);
     },
 
     updateView(response) {
@@ -268,6 +283,23 @@ export default {
       this.first = response.first;
       this.last = response.last;
       this.loadingRecipes = false;
+    },
+
+    getQueryParams() {
+      let page = this.$route.query.page || this.page - 1;
+      let pageSize = this.$route.query.pageSize || this.pageSize;
+      let ingredients = this.$route.query.ingredients || "";
+      let notIngredients = this.$route.query.notIngredients || "";
+      let queryName = this.$route.query.queryName || "";
+
+      let queryParams = {
+        page: page,
+        pageSize: pageSize,
+        ingredients: ingredients,
+        notIngredients: notIngredients,
+        queryName: queryName,
+      };
+      return queryParams;
     },
     isDisabled() {},
   },

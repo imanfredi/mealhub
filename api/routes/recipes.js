@@ -23,12 +23,29 @@ let defaultOrderBy = orderByOptions.LESS_CALORIES;
 router.get("/", async (req, res) => {
   let page = req.query.page || defaultPage;
   let pageSize = req.query.pageSize || defaultPageSize;
-  filterByIngredients =
-    req.query.ingredients != null ? [req.query.ingredients].flat() : null;
-  filterByNotIngredients =
-    req.query.notIngredients != null ? [req.query.notIngredients].flat() : null;
+  console.log(req.query.page);
+  let filterByIngredients = null;
+
+  if (req.query.ingredients != null) {
+    if (!Array.isArray(req.query.ingredients)) {
+      filterByIngredients = req.query.ingredients.split(",");
+    } else {
+      filterByIngredients = req.query.ingredients;
+    }
+  }
+
+  let filterByNotIngredients = null;
+
+  if (req.query.notIngredients != null) {
+    if (!Array.isArray(req.query.notIngredients)) {
+      filterByNotIngredients = req.query.notIngredients.split(",");
+    } else {
+      filterByNotIngredients = req.query.notIngredients;
+    }
+  }
+
   orderBy = req.query.orderBy || defaultOrderBy;
-  let name = req.query.name;
+  let name = req.query.queryName;
 
   let results = await searchService.getRecipes(
     name,
@@ -83,14 +100,21 @@ function buildUrl(uri, req) {
   let params = "?";
 
   if (req.query.ingredients) {
-    let ingredients = [req.query.ingredients].flat();
+    let ingredients = req.query.ingredients;
+    if (!Array.isArray(req.query.ingredients)) {
+      ingredients = req.query.ingredients.split(",");
+    }
     for (i = 0; i < ingredients.length; i++) {
       params += "ingredients=" + ingredients[i] + "&";
     }
   }
 
   if (req.query.notIngredients) {
-    let notIngredients = [req.query.ingredients].flat();
+    let notIngredients = req.query.notIngredients;
+
+    if (!Array.isArray(req.query.notIngredients)) {
+      notIngredients = req.query.notIngredients.split(",");
+    }
     for (i = 0; i < notIngredients.length; i++) {
       params += "notIngredients" + notIngredients[i] + "&";
     }
