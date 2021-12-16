@@ -25,7 +25,6 @@ export default {
 
   async getRecipesById(context, payload) {
     try {
-      console.log(`${context.getters.baseURL}/recipes/` + payload.id);
       let response = await axios.get(
         `${context.getters.baseURL}/recipes/` + payload.id
       );

@@ -245,7 +245,6 @@ export default {
         query: { ...queryParams },
       });
 
-      console.log(queryParams);
 
       let response = await this.$store.dispatch("getRecipes", queryParams);
       this.updateView(response);

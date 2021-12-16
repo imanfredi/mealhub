@@ -7,7 +7,6 @@ var cors = require("cors");
 
 /*Router imports*/
 
-var usersRouter = require("./routes/users");
 var ingredientsRouter = require("./routes/ingredients");
 var recipesRouter = require("./routes/recipes");
 

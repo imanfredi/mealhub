@@ -23,7 +23,6 @@ let defaultOrderBy = orderByOptions.LESS_CALORIES;
 router.get("/", async (req, res) => {
   let page = req.query.page || defaultPage;
   let pageSize = req.query.pageSize || defaultPageSize;
-  console.log(req.query.page);
   let filterByIngredients = null;
 
   if (req.query.ingredients != null) {
