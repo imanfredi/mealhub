@@ -71,6 +71,10 @@ function buildParams(payload) {
   if (payload.queryName) {
     params.append("queryName", payload.queryName);
   }
+  if (payload.orderBy) {
+    params.append("orderBy", payload.orderBy);
+  }
+
   if (payload.ingredients) {
     let ingredients = payload.ingredients;
     if (Array.isArray(payload.ingredients) && payload.ingredients.length > 1) {

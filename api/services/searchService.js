@@ -46,7 +46,6 @@ class SearchService {
       filterByIngredients,
       filterByNotIngredients
     );
-    console.log(totalRecipes);
     if (totalRecipes == null) {
       return null;
     }

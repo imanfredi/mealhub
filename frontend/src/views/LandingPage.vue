@@ -83,6 +83,7 @@
               <v-row>
                 <v-col class="d-flex" cols="12">
                   <v-select
+                    v-model="orderBy"
                     :items="categories"
                     item-text="text"
                     item-value="value"
@@ -185,6 +186,7 @@ export default {
       page: 1,
       visible: 5,
       queryName: "",
+      orderBy: "LESS_CALORIES",
       pageSize: 3,
       valid: false,
       isActive: false,
@@ -203,7 +205,8 @@ export default {
       if (
         this.preferedIngredients.length == 0 &&
         this.notIngredients.length == 0 &&
-        this.queryName === ""
+        this.queryName === "" &&
+        this.orderBy === ""
       ) {
         return "disableButton";
       } else {
@@ -254,6 +257,7 @@ export default {
             ? this.preferedIngredients
             : "",
         queryName: this.$route.query.queryName || this.queryName || "",
+        orderBy: this.$route.query.orderBy || this.orderBy,
       };
 
       this.$router.push({
@@ -278,6 +282,7 @@ export default {
         queryName: this.queryName || "",
         ingredients: this.preferedIngredients || "",
         notIngredients: this.notIngredients || "",
+        orderBy: this.orderBy,
       };
 
       this.$router.push({
@@ -305,6 +310,7 @@ export default {
       let ingredients = this.$route.query.ingredients || "";
       let notIngredients = this.$route.query.notIngredients || "";
       let queryName = this.$route.query.queryName || "";
+      let orderBy = this.$route.query.orderBy || this.orderBy;
 
       let queryParams = {
         page: page,
@@ -312,6 +318,7 @@ export default {
         ingredients: ingredients,
         notIngredients: notIngredients,
         queryName: queryName,
+        orderBy: orderBy,
       };
       return queryParams;
     },

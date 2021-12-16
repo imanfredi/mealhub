@@ -48,6 +48,7 @@ class RecipesDao {
       page,
       pageSize
     );
+    console.log(query);
     let results = await this._neo4jDriver.executeQuery(query);
 
     let aggregation = this.buildMongoQuery(results, orderBy);
@@ -147,12 +148,12 @@ class RecipesDao {
     let order;
 
     if (aux[0] == "LESS") {
-      order = "DESC";
-    } else {
       order = "ASC";
+    } else {
+      order = "DESC";
     }
 
-    let order_by = ` ORDER BY r.${orderCriteria}, r.name, id(r)  ${order}`;
+    let order_by = ` ORDER BY r.${orderCriteria} ${order}, r.name ASC, id(r) ASC`;
     let limit = ` LIMIT ${pageSize}`;
     let skip = ` SKIP ${pageSize * page}`;
 

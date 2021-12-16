@@ -11,7 +11,7 @@
     </v-card-subtitle>
     <v-card-text class="d-flex justify-end">
       <b class="mx-1">Calories</b> {{ recipe.nutrition.calories }}
-      <b class="mx-1">Protein</b> {{ recipe.nutrition.calories }}g
+      <b class="mx-1">Protein</b> {{ recipe.nutrition.protein }}g
       <b class="mx-1">Carbs</b> {{ recipe.nutrition.carbohydrates }}g
       <b class="mx-1">Sugar</b> {{ recipe.nutrition.sugar }}g
       <b class="mx-1">Minutes</b> {{ recipe.minutes }}
