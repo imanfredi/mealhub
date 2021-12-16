@@ -4,6 +4,9 @@ const { filter, re } = require("mathjs");
 const router = express.Router();
 const Recipe = require("../models/Recipe");
 const orderByOptions = require("../models/RecipeOrderByOptions");
+const buildDevLogger = require("../logger/dev-logger");
+
+let logger = buildDevLogger();
 
 let searchService;
 let recipeService;
@@ -27,8 +30,14 @@ router.get("/", async (req, res) => {
 
   if (req.query.ingredients != null) {
     if (!Array.isArray(req.query.ingredients)) {
+      logger.info(
+        `GET /recipes: only one ingredient was sent ${req.query.ingredients}`
+      );
       filterByIngredients = req.query.ingredients.split(",");
     } else {
+      logger.info(
+        `GET /recipes: more than one ingredient was sent ${req.query.ingredients}`
+      );
       filterByIngredients = req.query.ingredients;
     }
   }
@@ -37,8 +46,14 @@ router.get("/", async (req, res) => {
 
   if (req.query.notIngredients != null) {
     if (!Array.isArray(req.query.notIngredients)) {
+      logger.info(
+        `GET /recipes: only one not ingredient was sent ${req.query.notIngredients}`
+      );
       filterByNotIngredients = req.query.notIngredients.split(",");
     } else {
+      logger.info(
+        `GET /recipes: more than one not ingredient was sent ${req.query.notIngredients}`
+      );
       filterByNotIngredients = req.query.notIngredients;
     }
   }
@@ -56,6 +71,7 @@ router.get("/", async (req, res) => {
   );
 
   if (results == null) {
+    logger.error("GET /recipes: results were null");
     return res.status(404).send("Recipes not found"); //FIXME: BAD REQUEST
   }
 
@@ -72,6 +88,8 @@ router.get("/", async (req, res) => {
 
   results.setResults(recipes);
 
+  logger.info("GET /recipes: sent recipes");
+
   createPaginationResponse(res, results, url);
 });
 
@@ -79,17 +97,21 @@ router.get("/:id", async (req, res) => {
   let id = req.params.id;
 
   if (!id) {
+    logger.error("GET /recipes/id: request ID was missing");
     return res.status(400).send("ID is missing");
   }
 
   let recipe = await recipeService.getRecipesById(id);
 
   if (recipe == null) {
+    logger.error("GET /recipes/id: recipe was null");
     return res.status(400).send();
   } else if (recipe.length == 0) {
+    logger.error("GET /recipes/id: recipe length was 0");
     return res.status(404).send(`Recipe with ${id} not found`);
   }
 
+  logger.info(`GET /recipes/id: sent recipe with id: ${id}`);
   res.send(recipe);
 
   //GET recipe with id
@@ -162,4 +184,5 @@ function addPaginationLinks(res, results, url) {
   res.send(results.getResults());
 }
 
+module.exports = buildDevLogger();
 module.exports = router;

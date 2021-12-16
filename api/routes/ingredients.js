@@ -1,5 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const buildDevLogger = require("../logger/dev-logger");
+
+let logger = buildDevLogger();
 
 let ingredientsService;
 require("../services/ingredientsService")().then(
@@ -13,10 +16,13 @@ router.get("/", async (req, res) => {
   let results = await ingredientsService.getIngredients();
 
   if (results == null) {
-    return res.status(404).send("Ingredients not found"); //FIXME: BAD REQUEST
+    logger.error("GET /ingredients: results were null");
+    return res.status(404).send("Ingredients not found");
   }
   // res.send(results);
+  logger.info("GET /ingredients: sent ingredients");
   res.send(results);
 });
 
+module.exports = buildDevLogger();
 module.exports = router;
