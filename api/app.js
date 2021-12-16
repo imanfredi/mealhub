@@ -29,10 +29,18 @@ app.use(cookieParser());
 
 /* Router middlewares */
 
-// app.use('/users', usersRouter);
-// app.use('/ingredients', ingredientsRouter);
 app.use("/recipes", recipesRouter);
 app.use("/ingredients", ingredientsRouter);
+
+app.use((req, res) => {
+  let apiRoutes = {
+    ingredientesUrl: process.env.BASE_URI + "ingredients",
+    recipesUrl:
+      process.env.BASE_URI +
+      "recipes/{?ingredients,page,pageSize,notIngredients,orderBy,queryName}",
+  };
+  res.send(apiRoutes);
+});
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

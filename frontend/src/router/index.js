@@ -10,11 +10,7 @@ const routes = [
     children: [
       {
         path: "",
-        redirect: "/Home",
-      },
-      {
-        path: "/Home",
-        name: "Home",
+        name: "LandingPage",
         component: () => import("../views/LandingPage"),
       },
       {

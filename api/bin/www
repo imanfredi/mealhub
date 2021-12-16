@@ -104,7 +104,7 @@ function onListening() {
 process.on("SIGINT", closeConnections);
 
 async function closeConnections() {
-  mongoDriver.closeConnection();
-  neo4JDriver.closeConnection();
+  await mongoDriver.closeConnection();
+  await neo4jDriver.closeConnection();
   process.exit();
 }

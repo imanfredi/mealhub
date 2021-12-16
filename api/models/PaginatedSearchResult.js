@@ -20,7 +20,7 @@ class PaginatedSearchResult {
   isFirst() {
     return this._isFirst;
   }
-  
+
   getTotalPages() {
     return this._totalPages;
   }

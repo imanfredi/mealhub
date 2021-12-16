@@ -13,11 +13,6 @@ class Neo4JDriver {
   async _init() {
     try {
       this._driver = neo4j.driver(process.env.DB_NEO4J_URI);
-      // this._driver = driver(process.env.DB_NEO4J_URI,
-      // neo4j.auth.basic(
-      //   process.env.DB_NEO4J_USER,
-      //   process.env.DB_NEO4J_PASSWORD
-      // ));
     } catch (e) {
       // Ensures that the client will close when you finish/error
       await this.closeConnection();
@@ -25,7 +20,7 @@ class Neo4JDriver {
   }
 
   async closeConnection() {
-    await this._driver.closeConnection();
+    await this._driver.close();
   }
 
   async executeQuery(query) {
@@ -39,8 +34,8 @@ class Neo4JDriver {
       });
       return results;
     } catch (e) {
-      return null;
       //FIXME loggear
+      return null;
     }
   }
 

@@ -25,7 +25,7 @@ class IngredientsDao {
     return (await this._neo4jDriver).executeQuery(query);
   }
 
-  async getIngredients(orderBy, page, pageSize) {
+  async getIngredients(orderBy) {
     let query = "MATCH (i:Ingredient) ";
 
     query += "RETURN DISTINCT i";
@@ -33,11 +33,8 @@ class IngredientsDao {
     let aux = orderBy.split("_");
 
     let order_by = ` ORDER BY i.name ${aux[0]}`;
-    // let skip = ` SKIP ${pageSize * page}`;
-    // let limit = ` LIMIT ${pageSize}`;
 
     query += order_by;
-
     return (await this._neo4jDriver).executeQuery(query);
   }
 }
