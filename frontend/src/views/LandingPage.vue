@@ -68,6 +68,29 @@
                   ></v-autocomplete>
                 </v-col>
               </v-row>
+              <v-row>
+                <v-col cols="12" class="pb-0 pt-0">
+                  <p class="text-center font-weight-medium strong mb-2">
+                    Order By
+                  </p>
+                </v-col>
+              </v-row>
+              <v-row align="center" justify="center">
+                <v-col cols="4" class="pt-0">
+                  <hr style="margin: auto" />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col class="d-flex" cols="12">
+                  <v-select
+                    :items="categories"
+                    item-text="text"
+                    item-value="value"
+                    solo
+                  >
+                  </v-select>
+                </v-col>
+              </v-row>
               <v-row align="center" justify="center">
                 <v-col cols="12" class="text-center">
                   <v-btn
@@ -95,21 +118,9 @@
         </v-card>
       </v-col>
       <v-col cols="6" class="d-flex-column align-center">
-        <v-card height="620px" color="#F1FAEE">
+        <v-card min-height="620px" color="#F1FAEE">
           <v-container v-if="!loadingRecipes">
-            <v-container v-if="recipes.length > 0">
-              <v-row>
-                <v-col cols="12" class="pt-7">
-                  <v-data-table
-                    :headers="headers"
-                    class="elevation-1"
-                    disable-filtering
-                    disable-pagination
-                    hide-default-footer
-                    no-data-text
-                  ></v-data-table>
-                </v-col>
-              </v-row>
+            <v-container v-if="recipes.length > 0" class="mt-10">
               <v-row v-for="(recipe, index) in recipes" :key="index">
                 <v-col cols="12">
                   <RecipeCard :recipe="recipe"></RecipeCard>
@@ -150,12 +161,17 @@ export default {
 
   data() {
     return {
-      headers: [
-        { text: "Calories", value: "calories" },
-        { text: "Protein (g)", value: "protein" },
-        { text: "Carbs (g)", value: "carbs" },
-        { text: "Sugar (g)", value: "sugar" },
-        { text: "Minutes", value: "minutes" },
+      categories: [
+        { value: "LESS_MINUTES", text: "Less Minutes" },
+        { value: "MOST_MINUTES", text: "Most Minutes" },
+        { value: "LESS_CALORIES", text: "Less Calories" },
+        { value: "MOST_CALORIES", text: "Most Calories" },
+        { value: "LESS_SUGAR", text: "Less Sugar" },
+        { value: "MOST_SUGAR", text: "Most Sugar" },
+        { value: "LESS_PROTEIN", text: "Less Protein" },
+        { value: "MOST_PROTEIN", text: "Most Protein" },
+        { value: "LESS_CARBOHYDRATES", text: "Less Carbs" },
+        { value: "MOST_CARBOHYDRATES", text: "Most Carbs" },
       ],
       recipes: [],
       preferedIngredients: [],
@@ -244,7 +260,6 @@ export default {
         path: this.$route.path,
         query: { ...queryParams },
       });
-
 
       let response = await this.$store.dispatch("getRecipes", queryParams);
       this.updateView(response);
