@@ -31,8 +31,9 @@
                       :key="'tag' + index"
                       outlined
                       class="mr-1"
-                      >{{ tag }}</v-chip
-                    >
+                      style="pointer-events: none"
+                      >{{ tag }}
+                    </v-chip>
                   </v-card-text>
                 </v-card>
               </v-col>
