@@ -4,7 +4,7 @@
       <v-col cols="5">
         <v-card color="#F1FAEE" class="ml-16 pt-5 px-4">
           <v-form v-model="valid">
-            <v-container v-if="!loadingIngredients" fill-height fuild>
+            <v-container v-if="!loadingIngredients" fill-height fluid>
               <v-row align="center" justify="center">
                 <v-col cols="12">
                   <v-text-field
@@ -107,12 +107,13 @@
                 </v-col>
               </v-row>
             </v-container>
-            <v-container v-else fill-height fuild>
+            <v-container v-else fill-height fluid>
               <v-progress-circular
                 :size="70"
                 :width="7"
                 color="#A8DADC"
                 indeterminate
+                style="display: block; margin: 0 auto"
               ></v-progress-circular>
             </v-container>
           </v-form>
@@ -139,13 +140,16 @@
             </v-container>
             <v-container v-else> There is no recipes to show </v-container>
           </v-container>
-          <v-container v-else>
-            <v-progress-circular
-              :size="70"
-              :width="7"
-              color="#A8DADC"
-              indeterminate
-            ></v-progress-circular>
+          <v-container fluid v-else>
+            <v-layout align-center justify-center column fill-height>
+              <v-progress-circular
+                :size="70"
+                :width="7"
+                color="#A8DADC"
+                indeterminate
+                style="display: block; margin: auto"
+              ></v-progress-circular>
+            </v-layout>
           </v-container>
         </v-card>
       </v-col>
