@@ -2,10 +2,11 @@ import axios from "axios";
 
 export default {
   async getRecipes(context, payload) {
+    let response;
     try {
       let params = buildParams(payload);
 
-      let response = await axios.get(
+      response = await axios.get(
         `${context.getters.baseURL}/recipes?` + params
       );
 
@@ -18,8 +19,7 @@ export default {
         ...pagination,
       };
     } catch (error) {
-      throw new Error(error);
-      //FIXME: lanzar error
+      console.log(error);
     }
   },
 
@@ -31,7 +31,7 @@ export default {
       return response.data[0];
     } catch (error) {
       console.log(error);
-      throw new Error(error);
+      throw new Error("Recipe not found");
     }
   },
 };

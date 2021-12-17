@@ -20,7 +20,7 @@ require("../services/recipeService")().then(
 );
 
 let defaultPage = 0;
-let defaultPageSize = 16;
+let defaultPageSize = 3;
 let defaultOrderBy = orderByOptions.LESS_CALORIES;
 
 router.get("/", async (req, res) => {

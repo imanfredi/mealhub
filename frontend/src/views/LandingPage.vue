@@ -234,13 +234,29 @@ export default {
         query: { ...queryParams },
       });
 
-      let response = await this.$store.dispatch("getRecipes", queryParams);
+      let response;
+      try {
+        response = await this.$store.dispatch("getRecipes", queryParams);
+      } catch (e) {
+        this.$router.push({
+          name: "Error",
+          params: { message: e, statusCode: "500" },
+        });
+      }
+
       this.updateView(response);
     },
 
     async seedIngredients() {
       if (this.ingredients.length == 0) {
-        this.$store.dispatch("getIngredients");
+        try {
+          await this.$store.dispatch("getIngredients");
+        } catch (e) {
+          this.$router.push({
+            name: "Error",
+            params: { message: e, statusCode: "500" },
+          });
+        }
       }
       this.loadingIngredients = false;
     },
@@ -294,7 +310,15 @@ export default {
         query: { ...queryParams },
       });
 
-      let response = await this.$store.dispatch("getRecipes", queryParams);
+      let response;
+      try {
+        response = await this.$store.dispatch("getRecipes", queryParams);
+      } catch (e) {
+        this.$router.push({
+          name: "Error",
+          params: { message: e, statusCode: "404" },
+        });
+      }
 
       this.updateView(response);
     },
