@@ -63,7 +63,7 @@ The neo4j database was used to mainly store the relationships between the ingred
     `docker run --name mealhubNeo4j -p 7474:7474 -p 7687:7687 --env=NEO4J_AUTH=none -d neo4j`
 
 2.  Move the file recipes.json to the neo4j container:
-    `docker cp recipes.jsonmealhubNeo4j:/var/lib/neo4j/import/recipes.json`
+    `docker cp recipes.json mealhubNeo4j:/var/lib/neo4j/import/recipes.json`
 
 3.  Establish the connection with neo4j and populate the database running:
     `node neo4jPopulation.js`
