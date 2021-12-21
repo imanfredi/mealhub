@@ -4,15 +4,15 @@
       <v-col cols="6">
         <v-card light color="#F1FAEE" class="pa-5" elevation="5">
           <v-img
-            src="../assets/images/Error.png"
+            src="../assets/images/Error.svg"
             :max-height="this.$vuetify.breakpoint.smAndDown ? '120' : '180'"
             contain
           />
-          <h1 class="text-center text-h5 text-md-h3 font-weight-bold mb-5">
-            Ooops... Error {{ statusCode }}
+          <h1 class="text-center text-h5 text-md-h3 font-weight-bold mb-5 mt-4">
+            Ooops...
           </h1>
           <h2 class="text-center text-h6 text-md-h4 font-weight-medium my-5">
-            {{ message }}
+            Page {{ message }}
           </h2>
         </v-card>
       </v-col>
