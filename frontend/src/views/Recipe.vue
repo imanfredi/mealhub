@@ -1,5 +1,5 @@
 <template>
-  <v-container fill-height fluid class="pa-0" style="overflow-y: scroll">
+  <v-container class="pa-0 recipe-container">
     <v-row class="ma-0">
       <v-col cols="12" align="center" justify="center">
         <v-card color="#F1FAEE" width="700px" min-height="800px">
@@ -31,7 +31,7 @@
                       v-for="(tag, index) in recipe.tags.slice(0, 10)"
                       :key="'tag' + index"
                       outlined
-                      class="mr-1"
+                      class="mr-1 my-1"
                       style="pointer-events: none"
                       >{{ tag }}
                     </v-chip>
@@ -140,5 +140,12 @@ export default {
 }
 .v-data-table__empty-wrapper {
   display: none !important;
+}
+.recipe-container {
+  overflow-y: scroll !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  min-height: 100vh !important;
 }
 </style>

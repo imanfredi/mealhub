@@ -4,10 +4,11 @@
     outlined
     class="d-flex-column recipe_card"
     :to="{ name: 'RecipeDetails', params: { id: recipe.id, recipe: recipe } }"
+    style="min-height: 125px !important"
   >
-    <v-card-title>{{ recipe.title }}</v-card-title>
+    <v-card-title class="card_text">{{ recipe.title }}</v-card-title>
     <v-card-subtitle style="text-overflow: ellipsis !important">
-      <div class="description_text">{{ recipe.description }}</div>
+      <div class="card_text">{{ recipe.description }}</div>
     </v-card-subtitle>
     <v-card-text class="d-flex justify-end">
       <b class="mx-1">Calories</b> {{ recipe.nutrition.calories }}
@@ -34,13 +35,11 @@ export default {
   transform: scale(1.01);
   cursor: pointer;
 }
-.description_text {
-  white-space: nowrap;
-  word-break: normal;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.recipe_card {
-  height: 130px;
+.card_text {
+  display: block !important;
+  white-space: nowrap !important;
+  word-break: normal !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 </style>

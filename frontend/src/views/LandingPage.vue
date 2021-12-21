@@ -1,8 +1,8 @@
 <template>
-  <v-container>
-    <v-row>
+  <v-container class="landing-container">
+    <v-row class="ma-0" style="display: flex; justify-content: space-around">
       <v-col cols="5">
-        <v-card color="#F1FAEE" class="ml-16 pt-5 px-4">
+        <v-card color="#F1FAEE" class="py-4 px-7">
           <v-form v-model="valid">
             <v-container v-if="!loadingIngredients" fill-height fluid>
               <v-row align="center" justify="center">
@@ -55,7 +55,7 @@
                 </v-col>
               </v-row>
               <v-row>
-                <v-col cols="12" class="pb-0 pt-0">
+                <v-col cols="12" class="py-0">
                   <v-autocomplete
                     chips
                     clearable
@@ -69,7 +69,7 @@
                 </v-col>
               </v-row>
               <v-row>
-                <v-col cols="12" class="pb-0 pt-0">
+                <v-col cols="12" class="py-0">
                   <p class="text-center font-weight-medium strong mb-2">
                     Order By
                   </p>
@@ -93,7 +93,7 @@
                 </v-col>
               </v-row>
               <v-row align="center" justify="center">
-                <v-col cols="12" class="text-center">
+                <v-col cols="12" class="text-center py-0">
                   <v-btn
                     @click="search"
                     color="#A8DADC"
@@ -102,7 +102,7 @@
                     dark
                     :class="btnClass"
                   >
-                    Buscar
+                    Search
                   </v-btn>
                 </v-col>
               </v-row>
@@ -119,8 +119,8 @@
           </v-form>
         </v-card>
       </v-col>
-      <v-col cols="6" class="d-flex-column align-center">
-        <v-card min-height="620px" color="#F1FAEE">
+      <v-col cols="6">
+        <v-card min-height="620px" min-width="585px" color="#F1FAEE">
           <v-container v-if="!loadingRecipes">
             <v-container v-if="recipes.length > 0" class="mt-10">
               <v-row v-for="(recipe, index) in recipes" :key="index">
@@ -128,17 +128,27 @@
                   <RecipeCard :recipe="recipe"></RecipeCard>
                 </v-col>
               </v-row>
-              <v-pagination
-                @input="onPageChange($event)"
-                :length="last"
-                color="#A8DADC"
-                v-model="page"
-                :total-visible="visible"
-                class="mt-5"
-              >
-              </v-pagination>
+              <v-row>
+                <v-col cols="12" align-self="end">
+                  <v-pagination
+                    @input="onPageChange($event)"
+                    :length="last"
+                    color="#A8DADC"
+                    v-model="page"
+                    :total-visible="visible"
+                    class="mt-5"
+                  >
+                  </v-pagination>
+                </v-col>
+              </v-row>
             </v-container>
-            <v-container v-else> There is no recipes to show </v-container>
+            <v-container v-else>
+              <v-row>
+                <v-col cols="12">
+                  <p class="text-center">There is no recipes to show</p>
+                </v-col>
+              </v-row>
+            </v-container>
           </v-container>
           <v-container fluid v-else>
             <v-layout align-center justify-center column fill-height>
@@ -371,5 +381,14 @@ export default {
   background-color: #cccccc !important;
   color: #666666 !important;
   pointer-events: none !important;
+}
+.landing-container {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  min-height: 80vh !important;
+}
+.v-chip {
+  background-color: #ffe8d6 !important;
 }
 </style>

@@ -5,7 +5,7 @@
         <router-link
           to="/?page=0&pageSize=3&ingredients=&notIngredients=&queryName=meat&orderBy=LESS_CALORIES"
         >
-          <span style="cursor: pointer">MealHub</span>
+          <span style="cursor: pointer"><strong>MealHub</strong></span>
         </router-link>
       </v-col>
     </v-row>
