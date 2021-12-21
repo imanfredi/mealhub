@@ -3,7 +3,7 @@
     <v-row align="center">
       <v-col cols="4" class="d-flex justify-start pl-4">
         <router-link
-          to="/?page=0&pageSize=3&ingredients=&notIngredients=&queryName=meat&orderBy=LESS_CALORIES"
+          to="/?page=0&pageSize=3&ingredients=&notIngredients=&queryName=&orderBy=LESS_CALORIES"
         >
           <span style="cursor: pointer"><strong>MealHub</strong></span>
         </router-link>

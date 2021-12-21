@@ -6,7 +6,9 @@
           <v-container fill-height fluid v-if="!loadingRecipe">
             <v-row>
               <v-col cols="12" align="center">
-                <h1 style="text-decoration: underline">Recipe</h1>
+                <h1 style="text-decoration: underline" class="capitalize">
+                  {{ recipe.title }}
+                </h1>
               </v-col>
               <v-col cols="12" align="center">
                 <v-card color="#FFE8D6">
@@ -18,12 +20,13 @@
                     ><span
                       v-for="(ingredient, index) in recipe.ingredients"
                       :key="index"
+                      style="display: inline-block"
+                      class="capitalize"
                     >
                       {{ ingredient }}
-
-                      <span v-if="index != recipe.ingredients.length - 1"
-                        >,</span
-                      >
+                      <span v-if="index != recipe.ingredients.length - 1">
+                        ,
+                      </span>
                     </span>
                     <v-divider class="my-3"></v-divider>
                     <b class="mr-3">Tags:</b>
@@ -31,7 +34,7 @@
                       v-for="(tag, index) in recipe.tags.slice(0, 10)"
                       :key="'tag' + index"
                       outlined
-                      class="mr-1 my-1"
+                      class="mr-1 my-1 capitalize"
                       style="pointer-events: none"
                       >{{ tag }}
                     </v-chip>
@@ -43,9 +46,11 @@
                   <v-card-title class="justify-center"
                     >Description</v-card-title
                   >
-                  <v-card-text align="start">{{
-                    recipe.description
-                  }}</v-card-text>
+                  <v-card-text align="start" class="capitalize">
+                    <p>
+                      {{ recipe.description }}
+                    </p></v-card-text
+                  >
                 </v-card>
               </v-col>
               <v-col cols="12" align="center">
@@ -86,7 +91,15 @@
               </v-col>
             </v-row>
           </v-container>
-          <v-container else> </v-container>
+          <v-container v-else fill-height fluid>
+            <v-progress-circular
+              :size="70"
+              :width="7"
+              color="#A8DADC"
+              indeterminate
+              style="display: block; margin: 0 auto"
+            ></v-progress-circular>
+          </v-container>
         </v-card>
       </v-col>
     </v-row>
@@ -147,5 +160,13 @@ export default {
   justify-content: center !important;
   align-items: center !important;
   min-height: 100vh !important;
+}
+
+.capitalize:first-letter {
+  text-transform: capitalize;
+}
+
+h2:after {
+  content: "\00a0";
 }
 </style>

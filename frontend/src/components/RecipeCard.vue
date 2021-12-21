@@ -6,9 +6,9 @@
     :to="{ name: 'RecipeDetails', params: { id: recipe.id, recipe: recipe } }"
     style="min-height: 125px !important"
   >
-    <v-card-title class="card_text">{{ recipe.title }}</v-card-title>
+    <v-card-title class="card_text capitalize">{{ recipe.title }}</v-card-title>
     <v-card-subtitle style="text-overflow: ellipsis !important">
-      <div class="card_text">{{ recipe.description }}</div>
+      <div class="card_text capitalize">{{ recipe.description }}</div>
     </v-card-subtitle>
     <v-card-text class="d-flex justify-end">
       <b class="mx-1">Calories</b> {{ recipe.nutrition.calories }}
@@ -41,5 +41,9 @@ export default {
   word-break: normal !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+}
+
+.capitalize::first-letter {
+  text-transform: capitalize;
 }
 </style>

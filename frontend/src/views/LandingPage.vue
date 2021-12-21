@@ -239,19 +239,23 @@ export default {
     async seedRecipes() {
       let queryParams = this.getQueryParams();
 
-      this.$router.push({
-        path: this.$route.path,
-        query: { ...queryParams },
-      });
+      this.$router
+        .push({
+          path: this.$route.path,
+          query: { ...queryParams },
+        })
+        .catch(() => {});
 
       let response;
       try {
         response = await this.$store.dispatch("getRecipes", queryParams);
       } catch (e) {
-        this.$router.push({
-          name: "Error",
-          params: { message: e, statusCode: "500" },
-        });
+        this.$router
+          .push({
+            name: "Error",
+            params: { message: e, statusCode: "500" },
+          })
+          .catch(() => {});
       }
 
       this.updateView(response);
@@ -262,10 +266,12 @@ export default {
         try {
           await this.$store.dispatch("getIngredients");
         } catch (e) {
-          this.$router.push({
-            name: "Error",
-            params: { message: e, statusCode: "500" },
-          });
+          this.$router
+            .push({
+              name: "Error",
+              params: { message: e, statusCode: "500" },
+            })
+            .catch(() => {});
         }
       }
       this.loadingIngredients = false;
@@ -284,16 +290,18 @@ export default {
             : "",
         notIngredients:
           this.$route.query.notIngredients || this.notIngredients.length > 0
-            ? this.preferedIngredients
+            ? this.notIngredients
             : "",
         queryName: this.$route.query.queryName || this.queryName || "",
         orderBy: this.$route.query.orderBy || this.orderBy,
       };
 
-      this.$router.push({
-        path: this.$route.path,
-        query: { ...queryParams },
-      });
+      this.$router
+        .push({
+          path: this.$route.path,
+          query: { ...queryParams },
+        })
+        .catch(() => {});
 
       let response = await this.$store.dispatch("getRecipes", queryParams);
       this.updateView(response);
@@ -315,19 +323,23 @@ export default {
         orderBy: this.orderBy,
       };
 
-      this.$router.push({
-        path: this.$route.path,
-        query: { ...queryParams },
-      });
+      this.$router
+        .push({
+          path: this.$route.path,
+          query: { ...queryParams },
+        })
+        .catch(() => {});
 
       let response;
       try {
         response = await this.$store.dispatch("getRecipes", queryParams);
       } catch (e) {
-        this.$router.push({
-          name: "Error",
-          params: { message: e, statusCode: "404" },
-        });
+        this.$router
+          .push({
+            name: "Error",
+            params: { message: e, statusCode: "404" },
+          })
+          .catch(() => {});
       }
 
       this.updateView(response);

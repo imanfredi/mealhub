@@ -48,7 +48,6 @@ class RecipesDao {
       page,
       pageSize
     );
-    console.log(query);
     let results = await this._neo4jDriver.executeQuery(query);
 
     let aggregation = this.buildMongoQuery(results, orderBy);
