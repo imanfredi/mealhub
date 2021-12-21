@@ -85,7 +85,14 @@
                     :key="'step' + index"
                     class="text-left pa-0"
                   >
-                    <v-list-item> {{ index }}. {{ step }} </v-list-item>
+                    <v-list-item>
+                      {{ index }}.
+                      <span
+                        style="display: inline-block"
+                        class="capitalize ml-1"
+                        >{{ step }}</span
+                      >
+                    </v-list-item>
                   </v-card-text>
                 </v-card>
               </v-col>
